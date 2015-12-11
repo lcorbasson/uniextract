@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------
 ;
-; Universal Extractor v1.4
+; Universal Extractor v1.4.1
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
 ; Language:	AutoIt v3.2.0.1
@@ -18,7 +18,7 @@
 #include <GUIConstants.au3>
 #include <File.au3>
 $name = "Universal Extractor"
-$version = "1.4"
+$version = "1.4.1"
 $title = $name & " v" & $version
 $prefs = @scriptdir & "\UniExtract.ini"
 $peidtitle = "PEiD v0.94"
@@ -111,85 +111,11 @@ endif
 
 ; If no file passed, display GUI to select file and set options
 if $prompt then
-	; Create GUI
-	GUICreate($title, 300, 195, -1, -1, -1, $WS_EX_ACCEPTFILES)
-	$dropzone = GUICtrlCreateLabel("", 0, 0, 300, 115)
-	GUICtrlCreateLabel(t('MAIN_FILE_LABEL'), 5, 5, -1, 15)
-	if $history then
-		$filecont = GUICtrlCreateCombo("", 5, 20, 260, 20)
-	else
-		$filecont = GUICtrlCreateInput("", 5, 20, 260, 20)
-	endif
-	$filebut = GUICtrlCreateButton("...", 270, 20, 25, 20)
-	GUICtrlCreateLabel(t('MAIN_DEST_DIR_LABEL'), 5, 45, -1, 15)
-	if $history then
-		$dircont = GUICtrlCreateCombo("", 5, 60, 260, 20)
-	else
-		$dircont = GUICtrlCreateInput("", 5, 60, 260, 20)
-	endif
-	$dirbut = GUICtrlCreateButton("...", 270, 60, 25, 20)
-	GUICtrlCreateGroup(t('MAIN_PREFS_LABEL', _ArrayCreate($name)), 5, 90, 290, 70)
-	GUICtrlCreateLabel(t('MAIN_DEBUG_LABEL'), 10, 113, 90, 20)
-	$debugcont = GUICtrlCreateInput($debugdir, 105, 110, 155, 20)
-	$debugbut = GUICtrlCreateButton("...", 265, 110, 25, 20)
-	GUICtrlCreateLabel(t('MAIN_LANG_LABEL'), 10, 138, 50, 15)
-	$langselect = GUICtrlCreateCombo("", 65, 135, 95, 20, $CBS_DROPDOWNLIST)
-	$historyopt = GUICtrlCreateCheckBox(t('MAIN_ARCHIVE_LABEL'), 170, 135, 120, 20)
-	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	$ok = GUICtrlCreateButton(t('OK_BUT'), 55, 170, 80, 20)
-	$cancel = GUICtrlCreateButton(t('CANCEL_BUT'), 165, 170, 80, 20)
-
-	; Set properties
-	GUICtrlSetBkColor($dropzone, $GUI_BKCOLOR_TRANSPARENT)
-	GUICtrlSetState($dropzone, $GUI_DISABLE)
-	GUICtrlSetState($dropzone, $GUI_DROPACCEPTED)
-	GUICtrlSetState($filecont, $GUI_FOCUS)
-	GUICtrlSetState($ok, $GUI_DEFBUTTON)
-	if $file <> "" then
-		;$file = filegetlongname($file)
-		;GUICtrlSetData($filecont, $file)
-		$filedir = stringleft($file, stringinstr($file, '\', 0, -1)-1)
-		$fileext = stringtrimleft($file, stringinstr($file, '.', 0, -1))
-		$filename = stringtrimright(stringtrimleft($file, stringlen($filedir)+1), stringlen($fileext)+1)
-		if $history then
-			$filelist = '|' & $file & '|' & ReadHist('file')
-			GUICtrlSetData($filecont, $filelist, $file)
-			$dirlist = '|' & $filedir & '\' & $filename & '|' & ReadHist('directory')
-			GUICtrlSetData($dircont, $dirlist, $filedir & '\' & $filename)
-		else
-			GUICtrlSetData($filecont, $file)
-			GUICtrlSetData($dircontcont, $filedir & '\' & $filename)
-		endif
-		GUICtrlSetState($dircont, $GUI_FOCUS)
-	elseif $history then
-		GUICtrlSetData($filecont, ReadHist('file'))
-		GUICtrlSetData($dircont, ReadHist('directory'))
-	endif
-	if $history then
-		GUICtrlSetState($historyopt, $GUI_CHECKED)
-	endif
-	if stringinstr($langlist, $language, 0) then
-		GUICtrlSetData($langselect, $langlist, $language)
-	else
-		GUICtrlSetData($langselect, $langlist, 'English')
-	endif
-
-
-	; Set events
-	GUISetOnEvent($GUI_EVENT_DROPPED, "GUI_Drop")
-	GUICtrlSetOnEvent($filebut, "GUI_File")
-	GUICtrlSetOnEvent($dirbut, "GUI_Directory")
-	GUICtrlSetOnEvent($debugbut, "GUI_Debug")
-	GUICtrlSetOnEvent($historyopt, "GUI_History")
-	GUICtrlSetOnEvent($ok, "GUI_Ok")
-	GUICtrlSetOnEvent($cancel, "GUI_Exit")
-	GUISetOnEvent($GUI_EVENT_CLOSE, "GUI_Exit")
-
-	; Display GUI and wait for action
-	GUISetState(@SW_SHOW)
+	CreateGUI()
 	$finishgui = 0
 	while 1
 		if $finishgui then exitloop
+		sleep(10)
 	wend
 endif
 
@@ -1309,6 +1235,114 @@ endfunc
 
 ; ------------------------ Begin GUI Control Functions ------------------------
 
+; Build and display GUI if necessary (moved to function to allow on-the-fly language changes)
+func CreateGUI()
+	; Create GUI
+	local $guimain = GUICreate($title, 300, 195, -1, -1, -1, $WS_EX_ACCEPTFILES)
+	local $dropzone = GUICtrlCreateLabel("", 0, 0, 300, 115)
+
+	; File controls
+	GUICtrlCreateLabel(t('MAIN_FILE_LABEL'), 5, 5, -1, 15)
+	if $history then
+		global $filecont = GUICtrlCreateCombo("", 5, 20, 260, 20)
+	else
+		global $filecont = GUICtrlCreateInput("", 5, 20, 260, 20)
+	endif
+	local $filebut = GUICtrlCreateButton("...", 270, 20, 25, 20)
+
+	; Directory controls
+	GUICtrlCreateLabel(t('MAIN_DEST_DIR_LABEL'), 5, 45, -1, 15)
+	if $history then
+		global $dircont = GUICtrlCreateCombo("", 5, 60, 260, 20)
+	else
+		global $dircont = GUICtrlCreateInput("", 5, 60, 260, 20)
+	endif
+	local $dirbut = GUICtrlCreateButton("...", 270, 60, 25, 20)
+
+	; Preferences box
+	GUICtrlCreateGroup(t('MAIN_PREFS_LABEL', _ArrayCreate($name)), 5, 90, 290, 70)
+
+	; Debug controls
+	local $debuglabel = GUICtrlCreateLabel(t('MAIN_DEBUG_LABEL'), 10, 113, -1, 20)
+	local $debuglabelwidth = GetWidth($guimain, $debuglabel, -5)
+	global $debugcont = GUICtrlCreateInput($debugdir, $debuglabelwidth, 110, 300 - $debuglabelwidth - 40, 20)
+	local $debugbut = GUICtrlCreateButton("...", 265, 110, 25, 20)
+
+	; Language controls
+	local $langlabel = GUICtrlCreateLabel(t('MAIN_LANG_LABEL'), 10, 138, -1, 15)
+	local $langlabelwidth = GetWidth($guimain, $langlabel, -5)
+	global $langselect = GUICtrlCreateCombo("", $langlabelwidth, 135, 95, 20, $CBS_DROPDOWNLIST)
+
+	; History option
+	local $langselectwidth = GetWidth($guimain, $langselect, 6)
+	global $historyopt = GUICtrlCreateCheckBox(t('MAIN_ARCHIVE_LABEL'), $langselectwidth, 135, -1, 20)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+	; Buttons
+	local $ok = GUICtrlCreateButton(t('OK_BUT'), 55, 170, 80, 20)
+	local $cancel = GUICtrlCreateButton(t('CANCEL_BUT'), 165, 170, 80, 20)
+
+	; Set properties
+	GUICtrlSetBkColor($dropzone, $GUI_BKCOLOR_TRANSPARENT)
+	GUICtrlSetState($dropzone, $GUI_DISABLE)
+	GUICtrlSetState($dropzone, $GUI_DROPACCEPTED)
+	GUICtrlSetState($filecont, $GUI_FOCUS)
+	GUICtrlSetState($ok, $GUI_DEFBUTTON)
+	if $file <> "" then
+		;$file = filegetlongname($file)
+		;GUICtrlSetData($filecont, $file)
+		$filedir = stringleft($file, stringinstr($file, '\', 0, -1)-1)
+		$fileext = stringtrimleft($file, stringinstr($file, '.', 0, -1))
+		$filename = stringtrimright(stringtrimleft($file, stringlen($filedir)+1), stringlen($fileext)+1)
+		if $history then
+			$filelist = '|' & $file & '|' & ReadHist('file')
+			GUICtrlSetData($filecont, $filelist, $file)
+			$dirlist = '|' & $filedir & '\' & $filename & '|' & ReadHist('directory')
+			GUICtrlSetData($dircont, $dirlist, $filedir & '\' & $filename)
+		else
+			GUICtrlSetData($filecont, $file)
+			GUICtrlSetData($dircont, $filedir & '\' & $filename)
+		endif
+		GUICtrlSetState($dircont, $GUI_FOCUS)
+	elseif $history then
+		GUICtrlSetData($filecont, ReadHist('file'))
+		GUICtrlSetData($dircont, ReadHist('directory'))
+	endif
+	if $history then
+		GUICtrlSetState($historyopt, $GUI_CHECKED)
+	endif
+	if stringinstr($langlist, $language, 0) then
+		GUICtrlSetData($langselect, $langlist, $language)
+	else
+		GUICtrlSetData($langselect, $langlist, 'English')
+	endif
+
+
+	; Set events
+	GUISetOnEvent($GUI_EVENT_DROPPED, "GUI_Drop")
+	GUICtrlSetOnEvent($filebut, "GUI_File")
+	GUICtrlSetOnEvent($dirbut, "GUI_Directory")
+	GUICtrlSetOnEvent($debugbut, "GUI_Debug")
+	GUICtrlSetOnEvent($langselect, "GUI_Lang")
+	GUICtrlSetOnEvent($historyopt, "GUI_History")
+	GUICtrlSetOnEvent($ok, "GUI_Ok")
+	GUICtrlSetOnEvent($cancel, "GUI_Exit")
+	GUISetOnEvent($GUI_EVENT_CLOSE, "GUI_Exit")
+
+	; Display GUI and wait for action
+	GUISetState(@SW_SHOW)
+endfunc
+
+; Return control width (for dynamic positioning)
+func GetWidth($gui, $control, $offset = 0)
+    $location = controlgetpos($gui, '', $control)
+	if @error then
+		seterror(1, '', 0)
+	else
+	    return $location[0] + $location[2] + $offset
+	endif
+endfunc
+
 ; Prompt user for file
 func GUI_File()
 	$file = fileopendialog(t('OPEN_FILE'), "", t('SELECT_FILE') & " (*.*)", 1)
@@ -1368,6 +1402,13 @@ func GUI_Debug()
 	if not @error then
 		GUICtrlSetData($debugcont, $tempdir)
 	endif
+endfunc
+
+; Process language selection
+func GUI_Lang()
+	$language = GUICtrlRead($langselect)
+	GUIDelete()
+	CreateGUI()
 endfunc
 
 ; Process history option selection

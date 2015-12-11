@@ -1,6 +1,6 @@
 [Setup]
 AppName=Universal Extractor
-AppVerName=Universal Extractor 1.4
+AppVerName=Universal Extractor 1.4.1
 AppPublisher=Jared Breland
 AppPublisherURL=http://www.legroom.net/mysoft
 AppSupportURL=http://www.legroom.net/mysoft
@@ -9,9 +9,9 @@ DefaultDirName={pf}\Universal Extractor
 DisableDirPage=false
 DefaultGroupName=Universal Extractor
 DisableProgramGroupPage=true
-OutputDir=Y:\software\uniextract\uniextract_14
-SourceDir=Y:\software\uniextract\uniextract_14
-OutputBaseFilename=uniextract14
+OutputDir=Y:\software\uniextract\uniextract_141
+SourceDir=Y:\software\uniextract\uniextract_141
+OutputBaseFilename=uniextract141
 SolidCompression=true
 Compression=lzma/ultra
 InternalCompressLevel=ultra
@@ -20,9 +20,9 @@ InternalCompressLevel=ultra
 ;InternalCompressLevel=none
 AlwaysShowComponentsList=false
 DisableReadyPage=false
-AppVersion=1.4
+AppVersion=1.4.1
 ShowLanguageDialog=auto
-VersionInfoVersion=1.4
+VersionInfoVersion=1.4.1
 VersionInfoCompany=Jared Breland
 VersionInfoDescription=Package for Universal Extractor
 ChangesEnvironment=true
@@ -278,6 +278,15 @@ Root: HKCR; SubKey: {reg:HKCR\.gz,}\shell\uniextract_sub; ValueType: string; Val
 Root: HKCR; SubKey: {reg:HKCR\.gz,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.gz')
 Root: HKCR; Subkey: .gz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.gz')
 Root: HKCR; Subkey: .gz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+
+Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract; ValueType: string; ValueData: UniExtract &Files...; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.imf')
+Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.imf')
+Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_here; ValueType: string; ValueData: UniExtract &Here; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.imf')
+Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.imf')
+Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_sub; ValueType: string; ValueData: UniExtract to &Subdir; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.imf')
+Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.imf')
+Root: HKCR; Subkey: .imf; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.imf')
+Root: HKCR; Subkey: .imf; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
 Root: HKCR; SubKey: {reg:HKCR\.img,}\shell\uniextract; ValueType: string; ValueData: UniExtract &Files...; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.img')
 Root: HKCR; SubKey: {reg:HKCR\.img,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.img')

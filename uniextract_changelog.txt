@@ -1,3 +1,13 @@
+1.4.1 (11/21/2006):
+
+  Added Chinese (Simplified), French, and German translations
+  Fixed bug in directory selection when archive name is passed to uniextract.exe
+  Fixed .imf file association in installer
+  Updated UniExtract to allow dynamic GUI language selection
+  Updated UniExtract to allow dynamic GUI control positioning
+  Updated UniExtract to prevent 100% CPU utilization during GUI display
+
+
 1.4 (11/18/2006):
 
   Added support for internationalization

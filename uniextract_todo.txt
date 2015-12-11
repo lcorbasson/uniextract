@@ -1,31 +1,29 @@
 Todo:
-Windows 9x support?
-optional debug file location
-make history tracking optional
-make debugging file output optional
-add "Detect filetype" option?
+
+non-admin fixes:
+registry:
+	HKCR\UniExtract
+add context-menu integration for limited users - comment 304
+
 separate associated file types for Windows Explorer sorting? - comment 116
-add support for Setup Factory installers? (need samples) - comment 121
 get 4nt shell solution from clauderenaud - comment 154
-link to Chinese port - comment 161
-add internationalization support? - comment 161
 Incorporate output within AutoIt GUI rather than spawning external shell(s)
 add option to open destination folder after extraction - comment 193
 add OLE extraction support? (need download link for olex_d)- comment 195
 add JPEG extraction support? - comment 195, 245
 figure out how to display and provide input for confirmation prompts
-fix unknown extension bug in installer - eg, .img
 add InstallShield 5.x, 7.x decompilers - comment 195
 powerpoint image extractor - comment 220
-multi-purpose file ripper - comment 220
-support InstallShield apps identified as Visual C++ - comment 227
 make AutoIt system tray icon visible? - comment 247
+windows 9x compatability issues - comment 285
 
-Can't do:
+Can't/can't do:
 - can PhotoStory3.exe be supported - comment 169
 - support ASprotect files? (need samples) - comment 169
 - support skypesetup.exe - comment 154 - custom build of Inno Setup
 - support for old-NSIS (compressed in BZip2) - comment 170 - NSIS doesn't support it
+- multi-purpose file ripper - comment 220
+- add support for Setup Factory installers? - comment 121
 
 Done:
 - check 7za.exe to see if current version supports all 7z.exe formats
@@ -52,3 +50,14 @@ Done:
 - fix mdt21_eng.exe - comment 265
 - fix 7-zip extraction - comment 260, 264 - temporary fix until overhaul in next version
 - add quicklaunch icon option
+- Windows 9x support?
+- extract Office beta installer - comment 261
+- add /d to comspec calls to disable AutoRun - comment 283
+- fix unknown extension bug in installer - eg, .img
+- link to Chinese port - comment 161
+- make history tracking optional
+- optional debug file location - comment 252
+- add option to open debug file directly - comment 293
+- add "Detect filetype" option?
+- add support for internationalization - comment 161
+- add support for LIT - comment 312

@@ -1,2 +1,2 @@
-del uniextract131_noinst.rar
-winrar.exe a -m5 -s uniextract131_noinst.rar ..\uniextract_changelog.txt ..\uniextract_todo.txt ..\uniextract_license.txt bin docs
+del uniextract14_noinst.rar
+winrar.exe a -m5 -s uniextract14_noinst.rar ..\uniextract_changelog.txt ..\uniextract_license.txt UniExtract.exe UniExtract.ini bin docs lang

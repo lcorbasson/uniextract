@@ -1,9 +1,29 @@
+1.4 (11/18/2006):
+
+  Added support for internationalization
+  Added option to disable history
+  Added option to specify location for debug file
+  Added ability to display log file if extraction fails
+  Added /d switch to @comspec calls to disable AutoRun conflicts
+  Added support for LIT (Microsoft ebook) files
+  Added support for Office 2007 beta installer
+  Added minor code optimizations
+  Changed UniExtract.exe to run from base directory rather than bin\
+  Changed UniExtract.exe to use .ini file for history rather than registry
+  Fixed typo in installer
+  Updated .exe file scanning process to speed up extraction
+  Updated installer to only offer system path option to Admin or Power Users
+  Updated KGB decompressor to 1.2.1.24
+  Updated UPX to 2.0.3
+
+
 1.3.1 (09/27/2006):
 
   Added Start Menu, Dersktop, Quick Launch icon options to installer
   Fixed 7-Zip and InfoZip checks on unknown executables
   Fixed 7-Zip extraction - now bypasses user input to prevent program hangs
   Fixed Windows 9x compatability issues
+  Fixed .wz file association
   Updated InstallShield support to recognize additional installers
   Updated WinRAR to 3.61
 

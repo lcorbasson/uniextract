@@ -1,6 +1,6 @@
 [Setup]
 AppName=Universal Extractor
-AppVerName=Universal Extractor 1.2
+AppVerName=Universal Extractor 1.2.1
 AppPublisher=Jared Breland
 AppPublisherURL=http://www.legroom.net/mysoft
 AppSupportURL=http://www.legroom.net/mysoft
@@ -8,9 +8,9 @@ AppUpdatesURL=http://www.legroom.net/mysoft
 DefaultDirName={pf}\Universal Extractor
 DisableDirPage=false
 DefaultGroupName=Universal Extractor
-OutputDir=Y:\windows\Packages\Universal_Extractor\uniextract_12
-SourceDir=Y:\windows\Packages\Universal_Extractor\uniextract_12
-OutputBaseFilename=uniextract12
+OutputDir=Y:\windows\Packages\Universal_Extractor\uniextract_121
+SourceDir=Y:\windows\Packages\Universal_Extractor\uniextract_121
+OutputBaseFilename=uniextract121
 SolidCompression=true
 Compression=lzma/ultra
 InternalCompressLevel=ultra
@@ -19,9 +19,9 @@ InternalCompressLevel=ultra
 ;InternalCompressLevel=none
 AlwaysShowComponentsList=false
 DisableReadyPage=true
-AppVersion=1.2
+AppVersion=1.2.1
 ShowLanguageDialog=auto
-VersionInfoVersion=1.2
+VersionInfoVersion=1.2.1
 VersionInfoCompany=Jared Breland
 VersionInfoDescription=Package for Universal Extractor
 ChangesEnvironment=true
@@ -41,6 +41,7 @@ Name: modifypath; Description: Add Universal Extractor to your system &path
 
 [Files]
 ;Source: UniExtract.au3; DestDir: {app}; Flags: ignoreversion
+Source: ..\changelog.txt; DestDir: {app}; Flags: ignoreversion
 Source: ..\license.txt; DestDir: {app}; Flags: ignoreversion
 Source: ..\todo.txt; DestDir: {app}; Flags: ignoreversion
 Source: ..\support\Icons\UniExtract_files.ico; DestDir: {app}; DestName: UniExtract.ico; Flags: ignoreversion

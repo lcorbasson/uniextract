@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------
 ;
-; Universal Extractor v1.2
+; Universal Extractor v1.2.1
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
 ; Language:	AutoIt v3.1.1.119-beta
@@ -16,7 +16,7 @@
 #notrayicon
 #include <GUIConstants.au3>
 #include <File.au3>
-$title = "Universal Extractor 1.2"
+$title = "Universal Extractor 1.2.1"
 $peidtitle = "PEiD v0.93"
 opt("GUIOnEventMode", 1)
 ;opt("WinTitleMatchMode", 4)
@@ -696,6 +696,7 @@ endfunc
 ; Function to prompt user for choice of Wise extraction method
 func WiseSelect()
 	; Create GUI
+	opt("GUIOnEventMode", 0)
 	GUICreate($title, 330, 180)
 	$header = GUICtrlCreateLabel("Wise Installer Extraction", 5, 5, 345, 20)
 	GUICtrlCreateLabel($title & " supports the following methods for extracting Wise", 5, 25, -1, 20)

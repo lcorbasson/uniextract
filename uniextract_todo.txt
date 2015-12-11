@@ -1,10 +1,6 @@
 Todo:
 
-non-admin fixes:
-registry:
-	HKCR\UniExtract
-add context-menu integration for limited users - comment 304
-
+fix context-menu integration for limited users (HKCR issue) - comment 304
 separate associated file types for Windows Explorer sorting? - comment 116
 get 4nt shell solution from clauderenaud - comment 154
 Incorporate output within AutoIt GUI rather than spawning external shell(s)
@@ -17,7 +13,7 @@ powerpoint image extractor - comment 220
 make AutoIt system tray icon visible? - comment 247
 windows 9x compatability issues - comment 285
 
-Can't/can't do:
+Can't do:
 - can PhotoStory3.exe be supported - comment 169
 - support ASprotect files? (need samples) - comment 169
 - support skypesetup.exe - comment 154 - custom build of Inno Setup

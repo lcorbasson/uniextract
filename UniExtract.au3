@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------
 ;
-; Universal Extractor v1.4.1
+; Universal Extractor v1.4.2
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
 ; Language:	AutoIt v3.2.0.1
@@ -18,7 +18,7 @@
 #include <GUIConstants.au3>
 #include <File.au3>
 $name = "Universal Extractor"
-$version = "1.4.1"
+$version = "1.4.2"
 $title = $name & " v" & $version
 $prefs = @scriptdir & "\UniExtract.ini"
 $peidtitle = "PEiD v0.94"
@@ -27,16 +27,16 @@ $sysdrive = stringleft(@windowsdir, 3)
 opt("GUIOnEventMode", 1)
 
 ; Preferences
-$cmd = @comspec & ' /d /c '
 $language = "English"
 $langdir = @scriptdir & "\lang"
-$height = @desktopheight/3
+$height = @desktopheight/4
 $debugdir = $sysdrive
 $history = 1
 dim $file, $filetype, $outdir, $prompt, $packed, $return, $output, $langlist
 dim $exsig, $loadplugins, $stayontop
 dim $testinno, $testarj, $testace, $test7z, $testzip
 dim $innofailed, $arjfailed, $acefailed, $7zfailed, $zipfailed
+dim $oldpath
 
 ; Extractors
 $7z = "7z.exe"
@@ -82,7 +82,7 @@ $zip = "unzip.exe"
 
 ; Set working path, include support for .au3 path to ease development
 ;if stringright(@scriptname, 3) = "au3" then
-	envset("path", @scriptdir & "\bin" & ';' & envget("path"))
+	;envset("path", @scriptdir & "\bin" & ';' & envget("path"))
 ;else
 ;	envset("path", @scriptdir & ';' & envget("path"))
 ;endif
@@ -142,13 +142,19 @@ if $history then
 	WriteHist('directory', $outdir)
 endif
 
-; Set tee output - Windows 9x does not support stderr redirection
+; Set environment options for appropriate version of Windows
 if stringright($debugdir, 1) <> '\' then $debugdir &= '\'
 $debugfile = filegetshortname($debugdir) & 'uniextract.txt'
-if @OSType == "WIN32_WINDOWS" then
-	$output = ' | tee.exe ' & $debugfile
-else
+if @OSType == "WIN32_NT" then
+	$cmd = @comspec & ' /d /c '
 	$output = ' 2>&1 | tee.exe ' & $debugfile
+	envset("path", @scriptdir & "\bin" & ';' & envget("path"))
+else
+	$cmd = @comspec & ' /c '
+	$output = ' | tee.exe ' & $debugfile
+	$oldpath = envget("path")
+	envset("path", filegetshortname(@scriptdir & "\bin") & ';' & $oldpath)
+	runwait($cmd & filegetshortname(@scriptdir & '\bin\winset.exe') & ' path=' & filegetshortname(@scriptdir & '\bin'), @windowsdir, @SW_HIDE)
 endif
 
 ; Extract contents from known file extensions
@@ -291,14 +297,12 @@ else
 	terminate("unknownext", $file, "")
 endif
 
-exit
-
 ; -------------------------- Begin Custom Functions ---------------------------
 
 ; Translate text
 func t($t, $vars = '')
-	$return = iniread($langdir & '\' & $language & '.ini', 'Internationalization', $t, '')
-	if $return == '' then $return = iniread($langdir & '\English.ini', 'Internationalization', $t, '???')
+	$return = iniread($langdir & '\' & $language & '.ini', 'UniExtract', $t, '')
+	if $return == '' then $return = iniread($langdir & '\English.ini', 'UniExtract', $t, '???')
 	;if stringinstr($return, ' //') then
 	;	$return = stringleft($return, stringinstr($return, ' //')-1)
 	;	if stringleft($return, 1) == '"' AND stringright($return, 1) == '"' then
@@ -325,13 +329,13 @@ func ReadPrefs()
 	if $value <> '' then $language = $value
 
 	; Read language files
-	$langs = filefindfirstfile($langdir & "\*.ini")
-	$fname = filefindnextfile($langs)
-	do
-		$langlist &= stringtrimright($fname, 4) & '|'
-		$fname = filefindnextfile($langs)
-	until @error
-	fileclose($langs)
+	$langlist = ''
+	local $langarr = _FileListToArray($langdir, '*.ini', 1)
+	_ArrayDelete($langarr, 0)
+	_ArraySort($langarr)
+	for $i = 0 to ubound($langarr)-1
+		$langlist &= stringtrimright($langarr[$i], 4) & '|'
+	next
 	$langlist = stringtrimright($langlist, 1)
 endfunc
 
@@ -441,10 +445,10 @@ func exescan($scantype)
 			$test7z = true
 
 		case stringinstr($filetype, "Microsoft Visual C++ 7.0", 0) AND stringinstr($filetype, "Custom", 0)
-			extract("vssfx", t('vssfx'))
+			extract("vssfx", t('VSSFX'))
 
 		case stringinstr($filetype, "Microsoft Visual C++ 6.0", 0) AND stringinstr($filetype, "Custom", 0)
-			extract("vssfxpath", t('vssfx'))
+			extract("vssfxpath", t('VSSFX'))
 
 		case stringinstr($filetype, "Nullsoft PiMP SFX", 0)
 			extract("nsis", t('NSIS'))
@@ -572,6 +576,7 @@ func extract($arctype, $arcdisp)
 	; Extract archive based on filetype
 	select
 		case $arctype == "7z"
+			;runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
 			runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "ace"
@@ -587,17 +592,17 @@ func extract($arctype, $arcdisp)
 			$convert =  msgbox(65, $title, t('CONVERT_BIN_CUE'))
 			if $convert <> 1 then
 				dirremove($outdir, 0)
-				exit
+				terminate("silent", '', '')
 			endif
 			if NOT fileexists($filedir & '\' & $filename & ".bin") then
 				msgbox(48, $title, t('CONVERT_BIN_MISSING_BIN', _ArrayCreate($filedir, $filename, $filename, $filename)))
 				dirremove($outdir, 0)
-				exit
+				terminate("silent", '', '')
 			endif
 			if NOT fileexists($filedir & '\' & $filename & ".cue") then
 				msgbox(48, $title, t('CONVERT_BIN_MISSING_CUE', _ArrayCreate($filedir, $filename, $filename, $filename)))
 				dirremove($outdir, 0)
-				exit
+				terminate("silent", '', '')
 			endif
 			controlsettext($title, '', 'Static1', t('CONVERT_BIN_STAGE1'))
 			runwait($cmd & $bin & ' "' & $filedir & '\' & $filename & '.cue"' & $output, $filedir)
@@ -614,7 +619,7 @@ func extract($arctype, $arcdisp)
 					$image = msgbox(51, $title, t('CONVERT_BIN_STAGE2_FAILED'))
 					if $image == 7 then filedelete($filedir & '\' & $isofilename)
 					dirremove($outdir, 0)
-					exit
+					terminate("silent", '', '')
 				else
 					filedelete($filedir & '\' & $isofilename)
 				endif
@@ -719,7 +724,7 @@ func extract($arctype, $arcdisp)
 				$cache = msgbox(65, $title, t('IS_CACHE_PROMPT'))
 				if $cache <> 1 then
 					dirremove($outdir, 0)
-					exit
+					terminate("silent", '', '')
 				endif
 
 				; Run installer and wait for temp files to be copied
@@ -781,7 +786,7 @@ func extract($arctype, $arcdisp)
 
 			; Extract using administrative install
 			if $choice = "msi_admin" then
-				runwait('msiexec.exe /a "' & $file & '" /qb /log ' & $debugfile & ' TARGETDIR="' & $outdir & '"', $filedir)
+				runwait('msiexec.exe /a "' & $file & '" /qb /l ' & $debugfile & ' TARGETDIR="' & $outdir & '"', $filedir)
 			
 			; Extract with msi2xml
 			elseif $choice = $msi_msi2xml then
@@ -859,7 +864,7 @@ func extract($arctype, $arcdisp)
 				$continue = msgbox(65, $title, t('WISE_MSI_PROMPT', _ArrayCreate($name)))
 				if $continue <> 1 then
 					dirremove($outdir, 0)
-					exit
+					terminate("silent", '', '')
 				endif
 
 				; First, check for any files that are already in extraction dir
@@ -975,14 +980,14 @@ func unpack()
 			terminate("success", "", "")
 		else
 			msgbox(48, $title, t('UNPACK_FAILED', _ArrayCreate($file)))
-			exit
+			terminate("silent", '', '')
 		endif
 	elseif $packer == "ASPack" then
 		runwait($cmd & $aspack & ' "' & $file & '" "' & $filedir & '\' & $filename & '_unpacked.exe" /NO_PROMPT', $filedir)
 		if fileexists($filedir & "\" & $filename & "_unpacked.exe") then
 			terminate("success", "", "")
 			msgbox(48, $title, t('UNPACK_FAILED', _ArrayCreate($file)))
-			exit
+			terminate("silent", '', '')
 		endif
 	endif
 	return
@@ -1069,7 +1074,16 @@ func terminate($status, $fname, $id)
 		; Exit successfully
 		case $status == "success"
 			filedelete($debugfile)
+
+		; Exit silently
+		case $status == "silent"
+
 	endselect
+
+	; Cleanup Win9x path due to AutoIt EnvSet() bug
+	if @OSType == "WIN32_WINDOWS" AND $oldpath <> '' then
+		runwait($cmd & filegetshortname(@scriptdir & '\bin\winset.exe') & ' path=' & $oldpath, @windowsdir, @SW_HIDE)
+	endif
 	exit
 endfunc
 
@@ -1116,7 +1130,7 @@ func ISSelect()
 			; Exit if Cancel clicked or window closed
 			case $action = $GUI_EVENT_CLOSE OR $action = $cancel
 				dirremove($outdir, 0)
-				exit
+				terminate("silent", '', '')
 		endselect
 	wend
 endfunc
@@ -1175,7 +1189,7 @@ func MSISelect()
 			; Exit if Cancel clicked or window closed
 			case $action = $GUI_EVENT_CLOSE OR $action = $cancel
 				dirremove($outdir, 0)
-				exit
+				terminate("silent", '', '')
 		endselect
 	wend
 endfunc
@@ -1228,7 +1242,7 @@ func WiseSelect()
 			; Exit if Cancel clicked or window closed
 			case $action = $GUI_EVENT_CLOSE OR $action = $cancel
 				dirremove($outdir, 0)
-				exit
+				terminate("silent", '', '')
 		endselect
 	wend
 endfunc
@@ -1244,7 +1258,7 @@ func CreateGUI()
 	; File controls
 	GUICtrlCreateLabel(t('MAIN_FILE_LABEL'), 5, 5, -1, 15)
 	if $history then
-		global $filecont = GUICtrlCreateCombo("", 5, 20, 260, 20)
+		global $filecont = GUICtrlCreateCombo("", 5, 20, 260, 20 * CharCount($langlist, '|'))
 	else
 		global $filecont = GUICtrlCreateInput("", 5, 20, 260, 20)
 	endif
@@ -1253,7 +1267,7 @@ func CreateGUI()
 	; Directory controls
 	GUICtrlCreateLabel(t('MAIN_DEST_DIR_LABEL'), 5, 45, -1, 15)
 	if $history then
-		global $dircont = GUICtrlCreateCombo("", 5, 60, 260, 20)
+		global $dircont = GUICtrlCreateCombo("", 5, 60, 260, 20 * CharCount($langlist, '|'))
 	else
 		global $dircont = GUICtrlCreateInput("", 5, 60, 260, 20)
 	endif
@@ -1264,22 +1278,22 @@ func CreateGUI()
 
 	; Debug controls
 	local $debuglabel = GUICtrlCreateLabel(t('MAIN_DEBUG_LABEL'), 10, 113, -1, 20)
-	local $debuglabelwidth = GetWidth($guimain, $debuglabel, -5)
-	global $debugcont = GUICtrlCreateInput($debugdir, $debuglabelwidth, 110, 300 - $debuglabelwidth - 40, 20)
+	local $debugcontpos = GetPos($guimain, $debuglabel, -5)
+	global $debugcont = GUICtrlCreateInput($debugdir, $debugcontpos, 110, 300 - $debugcontpos - 40, 20)
 	local $debugbut = GUICtrlCreateButton("...", 265, 110, 25, 20)
 
 	; Language controls
 	local $langlabel = GUICtrlCreateLabel(t('MAIN_LANG_LABEL'), 10, 138, -1, 15)
-	local $langlabelwidth = GetWidth($guimain, $langlabel, -5)
-	global $langselect = GUICtrlCreateCombo("", $langlabelwidth, 135, 95, 20, $CBS_DROPDOWNLIST)
+	local $langselectpos = GetPos($guimain, $langlabel, -5)
+	global $langselect = GUICtrlCreateCombo("", $langselectpos, 135, 95, 20 * CharCount($langlist, '|'), $CBS_DROPDOWNLIST)
 
 	; History option
-	local $langselectwidth = GetWidth($guimain, $langselect, 6)
-	global $historyopt = GUICtrlCreateCheckBox(t('MAIN_ARCHIVE_LABEL'), $langselectwidth, 135, -1, 20)
+	local $historyoptpos = GetPos($guimain, $langselect, 6)
+	global $historyopt = GUICtrlCreateCheckBox(t('MAIN_ARCHIVE_LABEL'), $historyoptpos, 135, -1, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
 	; Buttons
-	local $ok = GUICtrlCreateButton(t('OK_BUT'), 55, 170, 80, 20)
+	global $ok = GUICtrlCreateButton(t('OK_BUT'), 55, 170, 80, 20)
 	local $cancel = GUICtrlCreateButton(t('CANCEL_BUT'), 165, 170, 80, 20)
 
 	; Set properties
@@ -1334,13 +1348,19 @@ func CreateGUI()
 endfunc
 
 ; Return control width (for dynamic positioning)
-func GetWidth($gui, $control, $offset = 0)
+func GetPos($gui, $control, $offset = 0)
     $location = controlgetpos($gui, '', $control)
 	if @error then
 		seterror(1, '', 0)
 	else
 	    return $location[0] + $location[2] + $offset
 	endif
+endfunc
+
+; Return number of times a character appears in a string
+func CharCount($string, $char)
+	local $count = stringsplit($string, $char, 1)
+	return $count[0]
 endfunc
 
 ; Prompt user for file
@@ -1480,6 +1500,6 @@ endfunc
 
 ; Exit if Cancel clicked or window closed
 func GUI_Exit()
-	exit
+	terminate("silent", '', '')
 endfunc
 

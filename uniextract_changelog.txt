@@ -1,3 +1,22 @@
+1.4.2 (11/28/2006):
+
+  Added preferences page to installer to set defeault UniExtract options
+  Added multilingual support to installer (using Inno Setup message files)
+  Added multilingual support for context menu entries and custom installer messages
+  Added Chinese (Traditional), Italian, Japanese, and Thai translations
+  Fixed UniExtract crash when selecting archive file to extract through GUI
+  Fixed support for Windows Installer 2.0
+  Fixed combo box bug in history and language lists under Windows 9x
+  Fixed path issue under Windows 9x that prevented the noinst archive from working
+  Fixed translation error for KGB Self-Extracting archives
+  Updated installer to only offer context menu association to Admin or Power Users
+  Updated innounp to 0.18
+  Updated Inno Setup installer to 5.1.8
+  Updated Inno Setup CLI Help to 1.1
+  Updated Chinese (Simplified) translation
+  Updated UniExtract to display status box higher on screen to prevent overlap
+
+
 1.4.1 (11/21/2006):
 
   Added Chinese (Simplified), French, and German translations

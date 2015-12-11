@@ -1,6 +1,6 @@
 The following features should be added before version 1.0 is released:
 	ISO support
-	Associate only with archive files
+	History
 
 The following features are longer term goals:
 	NSIS support

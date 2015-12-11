@@ -1,21 +1,25 @@
 Todo:
+Windows 9x support?
+optional debug file location
+make history tracking optional
+make debugging file output optional
+add "Detect filetype" option?
 separate associated file types for Windows Explorer sorting? - comment 116
 add support for Setup Factory installers? (need samples) - comment 121
 get 4nt shell solution from clauderenaud - comment 154
 link to Chinese port - comment 161
 add internationalization support? - comment 161
 Incorporate output within AutoIt GUI rather than spawning external shell(s)
-troubleshoot comment 185
 add option to open destination folder after extraction - comment 193
 add OLE extraction support? (need download link for olex_d)- comment 195
-add JPEG extraction support? - comment 195
-add "Detect filetype" option?
+add JPEG extraction support? - comment 195, 245
 figure out how to display and provide input for confirmation prompts
 fix unknown extension bug in installer - eg, .img
 add InstallShield 5.x, 7.x decompilers - comment 195
 powerpoint image extractor - comment 220
 multi-purpose file ripper - comment 220
 support InstallShield apps identified as Visual C++ - comment 227
+make AutoIt system tray icon visible? - comment 247
 
 Can't do:
 - can PhotoStory3.exe be supported - comment 169
@@ -45,3 +49,6 @@ Done:
 - add support for InstallShield3 (*.z) - comment 170, 184, 195
 - additional inno setup support
 - 7-zip version - current beta version being used extracts .nsi - newer versions do not.  Preference?
+- fix mdt21_eng.exe - comment 265
+- fix 7-zip extraction - comment 260, 264 - temporary fix until overhaul in next version
+- add quicklaunch icon option

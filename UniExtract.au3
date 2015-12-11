@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------
 ;
-; Universal Extractor v1.3
+; Universal Extractor v1.3.1
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
 ; Language:	AutoIt v3.2.0.1
@@ -17,7 +17,7 @@
 #include <GUIConstants.au3>
 #include <File.au3>
 $name = "Universal Extractor"
-$version = "1.3"
+$version = "1.3.1"
 $title = $name & " v" & $version
 $peidtitle = "PEiD v0.94"
 $msxml4 = "http://www.microsoft.com/downloads/details.aspx?familyid=3144b72b-b4f2-46da-b4b6-c5d7485f2b42&displaylang=en"
@@ -61,11 +61,17 @@ $wise_ewise = "e_wise_w.exe"
 $wise_wun = "wun.exe"
 $Z = "7z.exe"
 $zip = "unzip.exe"
-$output = " 2>&1 | tee.exe c:\uniextract.txt"
 $height = @desktopheight/3
 dim $file, $filetype, $outdir, $prompt, $packed, $return
 dim $exsig, $loadplugins, $stayontop
 dim $testinno, $testarj, $testace, $test7z, $testzip
+
+; Set tee output - Windows 9x does not support stderr redirection
+if @OSType == "WIN32_WINDOWS" then
+	$output = " | tee.exe c:\uniextract.txt"
+else
+	$output = " 2>&1 | tee.exe c:\uniextract.txt"
+endif
 
 ; Set working path, include support for .au3 path to ease development
 if stringright(@scriptname, 3) = "au3" then
@@ -285,8 +291,10 @@ elseif $fileext = "exe" then
 	if $testinno then checkInno()
 	if $testarj then checkArj()
 	if $testace then checkAce()
-	if $test7z then check7z()
-	if $testzip then checkZip()
+
+	; Check for 7-Zip or InfoZip support on any unknown executables
+	check7z()
+	checkZip()
 	splashoff()
 
 	; Unpack (vs. extract) packed file
@@ -412,9 +420,6 @@ func exescan($scantype)
 		case stringinstr($filetype, "SuperDAT", 0)
 			extract("superdat", "McAfee SuperDAT updater")
 
-		;case stringinstr($filetype, "CAB SFX", 0) 
-		;	extract("cab2", "Self-Extracting Microsoft CAB archive")
-
 		case stringinstr($filetype, "Wise", 0) OR stringinstr($filetype, "PEncrypt 4.0", 0)
 			extract("wise", "Wise Installer package")
 
@@ -521,7 +526,7 @@ func extract($arctype, $arcdisp)
 	; Extract archive based on filetype
 	select
 		case $arctype == "7z"
-			runwait(@comspec & ' /c ' & $7z & ' x "' & $file & '"' & $output, $outdir)
+			runwait(@comspec & ' /c ' & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "ace"
 			runwait(@comspec & ' /c ' & $ace & ' -x "' & $file & '" "' & $outdir & '"' & $output, $filedir)

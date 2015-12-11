@@ -1,6 +1,6 @@
 [Setup]
 AppName=Universal Extractor
-AppVerName=Universal Extractor 1.3
+AppVerName=Universal Extractor 1.3.1
 AppPublisher=Jared Breland
 AppPublisherURL=http://www.legroom.net/mysoft
 AppSupportURL=http://www.legroom.net/mysoft
@@ -8,9 +8,10 @@ AppUpdatesURL=http://www.legroom.net/mysoft
 DefaultDirName={pf}\Universal Extractor
 DisableDirPage=false
 DefaultGroupName=Universal Extractor
-OutputDir=Y:\software\uniextract\uniextract_13
-SourceDir=Y:\software\uniextract\uniextract_13
-OutputBaseFilename=uniextract13
+DisableProgramGroupPage=true
+OutputDir=Y:\software\uniextract\uniextract_131
+SourceDir=Y:\software\uniextract\uniextract_131
+OutputBaseFilename=uniextract131
 SolidCompression=true
 Compression=lzma/ultra
 InternalCompressLevel=ultra
@@ -19,9 +20,9 @@ InternalCompressLevel=ultra
 ;InternalCompressLevel=none
 AlwaysShowComponentsList=false
 DisableReadyPage=false
-AppVersion=1.3
+AppVersion=1.3.1
 ShowLanguageDialog=auto
-VersionInfoVersion=1.3
+VersionInfoVersion=1.3.1
 VersionInfoCompany=Jared Breland
 VersionInfoDescription=Package for Universal Extractor
 ChangesEnvironment=true
@@ -32,15 +33,18 @@ UninstallDisplayIcon={app}\bin\UniExtract.exe
 WizardSmallImageFile=Y:\software\uniextract\support\Icons\uniextract_inno.bmp
 
 [CustomMessages]
-forcedesc=Force &association with all supported archive formats%nWarning: This may overwrite existing associations.
+;forcedesc=Force &association with all supported archive formats%nWarning: This may overwrite existing associations.
 
 [Tasks]
 Name: associate; Description: &Enable Explorer context menu integration; Flags: checkablealone
 Name: associate\files; Description: Add UniExtract &Files... to context menu
 Name: associate\here; Description: Add UniExtract &Here to context menu
 Name: associate\subdir; Description: Add UniExtract to &Subdir to context menu
-Name: associate\force; Description: {cm:forcedesc}; Flags: dontinheritcheck unchecked
+Name: associate\force; Description: Force &association with all supported archive formats; Flags: dontinheritcheck unchecked
 Name: modifypath; Description: Add Universal Extractor to your system &path
+Name: startmenuicon; Description: Create a Start &Menu icon
+Name: desktopicon; Description: Create a &desktop icon; Flags: unchecked
+Name: quicklaunchicon; Description: Create a &Quick Launch icon; Flags: unchecked
 
 [Files]
 ;Source: UniExtract.au3; DestDir: {app}; Flags: ignoreversion
@@ -52,7 +56,9 @@ Source: bin\*; DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
 Source: docs\*; DestDir: {app}\docs; Flags: ignoreversion
 
 [Icons]
-Name: {commonprograms}\Universal Extractor; Filename: {app}\bin\UniExtract.exe; WorkingDir: {app}
+Name: {commonprograms}\Universal Extractor; Filename: {app}\bin\UniExtract.exe; WorkingDir: {app}; Tasks: startmenuicon
+Name: {userdesktop}\Universal Extractor; Filename: {app}\bin\UniExtract.exe; WorkingDir: {app}; Tasks: desktopicon
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Universal Extractor; Filename: {app}\bin\UniExtract.exe; WorkingDir: {app}; Tasks: quicklaunchicon
 
 [Registry]
 ; Paths
@@ -465,7 +471,7 @@ end;
 
 const
 	ComponentList = '';
-	TaskList = 'associate - Enable Explorer context menu integration, associate\files - Add UniExtract Files... to context menu, associate\here - Add UniExtract Here to context menu, associate\subdir - Add UniExtract to Subdir to context menu, associate\force - Force association with all supported archive formats, modifypath - Add Universal Extractor to your system path';
+	TaskList = 'associate - Enable Explorer context menu integration, associate\files - Add UniExtract Files... to context menu, associate\here - Add UniExtract Here to context menu, associate\subdir - Add UniExtract to Subdir to context menu, associate\force - Force association with all supported archive formats, modifypath - Add Universal Extractor to your system path, startmenuicon - Create a Start Menu icon, desktopicon - Create a desktop icon, quicklaunchicon - Create a &Quick Launch icon';
 #include "..\..\clihelp\clihelp.iss"
 
 function ModPathDir(): String;

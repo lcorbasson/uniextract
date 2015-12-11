@@ -1,8 +1,30 @@
 Todo:
 
-Check feature request thread:
-http://www.msfn.org/board/index.php?showtopic=124535
+update language files
+remove i*comp? - http://www.msfn.org/board/topic/136743-zddll-license/
 
+7z support for UDF, XAR, DMG/HFS ?
+7z support for nifs, fat, vhd, mbr?
+7z support for gzip, bzip2, lzma, xz, tar from stdin?
+7z support for mslz?
+7z support for swf, flv?
+7z support for APM?
+
+improve 7-zip generic .exe resource extraction
+
+fix height of Program Options UI in installer - add vertical scrollbar?
+
+fix success evaluation - http://www.msfn.org/board/topic/143862-uniextract-161-in-development-info-requested/page__view__findpost__p__922518
+investigate archive listing - req 44
+7z sfx script extraction - req 46
+leave uniextract open after extraction - req 48
+Exeinfo PE as replacement for PEiD - req 51
+add option to delete after successful extraction?  - req 51
+improve context menu integration in Windows 7 - req 51
+LinMSI - req 51
+
+include menu bar in dropzone for files - doesn't seem possible
+investigate clickstream installer format
 change from MHT Unpacker to http://www.totalcmd.net/plugring/MhtUnPack.html
 update notification - http://www.kcsoftwares.com/index.php?sumo - 858
 new MSI unpacker - http://www.jsware.net/jsware/msicode.php3 - 832
@@ -14,7 +36,6 @@ fix noun/adjective order support for translations
 add option to not display foreground extraction box?
 add support for Spoon Installer (http://sourceforge.net/projects/spoon-installer/)
 command line automation - 775
-fix hotfix support - 767
 add association options to UniExtract in addition to installer
 vmunpacker - packed file decompressor (http://unpacking.narod.ru/unpackers/universal/VMUnpacker1.2.rar)
 super - 703
@@ -22,67 +43,22 @@ support .dmg with DMGExtractor. - 738
 Amiga formats - 718
 additional unpackers (plus check some older stuff) - 723
 additional unpackers - 735
-add support for Thinstall installers - 573
 new unpackers to test - 569
 support LiberalInstaller - 562 (probably not possible)
 add unshield.exe for InstallShield cabs - 558
 allow testing of multiple filetypes from TrID scan
-update translation instructions to specify Unicode
-update ExtractMHT?
 add cascaded context menu (what about cmenu?) - 447, 524
-fix missing ext extraction (eg, rar, msi, exe)? - 508
 add useful functionality to tray icon? - 503
-TrID defs update mechanism?
-support java 1.7 builds - 501
 add more exe unpackers? - 484
 support multiple file extraction - 502
-modify .msi to force asministrative installs? - 478
 Add option to copy rather than move temporary files - 439
 force "completed" message box to always be on top - 431
 add multiple aspack decompressors
 fix context-menu integration for limited users (HKCR issue) - comment 304
 separate associated file types for Windows Explorer sorting? - comment 116
-get 4nt shell solution from clauderenaud - comment 154
 Incorporate output within AutoIt GUI rather than spawning external shell(s)
 add option to open destination folder after extraction - comment 193
-add OLE extraction support? (need download link for olex_d)- comment 195
-add JPEG extraction support? - comment 195, 245
 figure out how to display and provide input for confirmation prompts
-powerpoint image extractor - comment 220
-windows 9x compatability issues - comment 285, 516, 525
-fix installer path issue under Windows 9x
-fix FileSearch() function under Windows 9x
 new formats? - Dragon UnPACKer, Game Extractor, Quick Unpack - 405
 new formats? - MultiExtractor - 395
 aspack - Stripper - 364, RL!deASPack 2.x - 359
-
-Can't do:
-- can PhotoStory3.exe be supported - comment 169
-- support ASprotect files? (need samples) - comment 169
-- support skypesetup.exe - comment 154 - custom build of Inno Setup
-- multi-purpose file ripper - comment 220
-- support .wim files - 447
-
-Done:
-- make optional:  docs, languages, Ace (7-zip?), SIT, Pea, KGB
-- 	hide language selection if not enabled
-- move english.ini to root dir
-- fix relative paths?  "uniextract.exe package.exe"
-- validate default log location can be written to prior to first attempt
-- fix _unpacked (lack of) translation
-- add sendto option for installer
-- fix /sub output (and verify everything else)
-- add Vietnamese to changelog
-- add "not IS package" option for IS false positives
-- document return codes
-- add generic fead support
-- add support for lzma - 575
-- fix MS hotfix issue
-- change default debug location for Vista compatibility
-- create separate system/user preference files
-- how to deal with fead and is false positives?
-- add warning before executing file for extraction
-- fix command line issue
-- remove Win9x-specific code
-- CD-image utilities (http://es.geocities.com/dextstuff/cdirip/download.html) - 715
-- add full options page? - 519

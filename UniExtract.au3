@@ -1,12 +1,12 @@
 ; ---------------------------------------------------------------------------e
 ;
-; Universal Extractor v1.6
+; Universal Extractor v1.6.1
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
-; Language:	AutoIt v3.2.10.0
+; Language:	AutoIt v3.3.6.1
 ; License:	GNU General Public License v2 (http://www.gnu.org/copyleft/gpl.html)
 ;
-; Script Function:
+; Very Basic Script Function:
 ;	Extract known archive types
 ;	Use TrID to determine filetype
 ;	Use PEiD to identify executable filetypes
@@ -16,16 +16,19 @@
 ; Setup environment
 ;#notrayicon
 #include <Array.au3>
-#include <GUIConstantsEx.au3>
 #include <File.au3>
+#include <GUIConstantsEx.au3>
+#include <StaticConstants.au3>
+#include <ComboConstants.au3>
+#include <WindowsConstants.au3>
 $name = "Universal Extractor"
-$version = "1.6"
+$version = "1.6.1"
 $title = $name & " v" & $version
 $website = "http://www.legroom.net/software/uniextract"
 $prefs = @scriptdir & "\UniExtract.ini"
 $reg = "HKCU\Software\UniExtract"
-$peidtitle = "PEiD v0.94"
-$msxml4 = "http://www.microsoft.com/downloads/details.aspx?familyid=3144b72b-b4f2-46da-b4b6-c5d7485f2b42&displaylang=en"
+$peidtitle = "PEiD v"
+;$msxml_down = "http://www.microsoft.com/downloads/details.aspx?FamilyID=993c0bcf-3bcf-4009-be21-27e85e1857b1&displaylang=en"
 opt("GUIOnEventMode", 1)
 
 ; Preferences
@@ -45,10 +48,10 @@ dim $file, $filename, $filedir, $fileext, $initoutdir, $outdir, $filetype
 dim $prompt, $packed, $return, $output, $langlist, $prefsonly
 dim $exsig, $loadplugins, $stayontop
 dim $testinno, $testarj, $testace, $test7z, $testzip, $testie
-dim $innofailed, $arjfailed, $acefailed, $7zfailed, $zipfailed, $iefailed, $feadfailed, $lzmafailed
+dim $innofailed, $arjfailed, $acefailed, $7zfailed, $zipfailed, $iefailed, $isfailed
 dim $aceinst, $kgbinst, $peainst, $sitinst
 dim $oldpath
-dim $createdir
+dim $createdir, $dirmtime
 dim $exitcode = 0
 
 ; Extractors
@@ -58,14 +61,13 @@ $arc = "arc.exe"
 $arj = "arj.exe"
 $aspack = "AspackDie.exe"
 $bin = "bin2iso.exe"
-$bz2 = "7z.exe"
+;$bz2 = "7z.exe"
 $cdi = "cdirip.exe"
-$chm = "7z.exe"
+;$chm = "7z.exe"
 $dbx = "cmdTotal.exe dbxplug.wcx"
-$gz = "7z.exe"
+;$gz = "7z.exe"
 $hlp = "helpdeco.exe"
 $ie = "cmdTotal.exe InstExpl.wcx"
-$imf = "7z.exe"
 $img = "EXTRACT.EXE"
 $inno = "innounp.exe"
 $is3arc = "i3comp.exe"
@@ -76,13 +78,14 @@ $isexe = "IsXunpack.exe"
 ;$iswcx = "cmdTotal.exe IShield.wcx"
 $kgb = "kgb_arch_decompress.exe" ;optional
 $lit = "clit.exe"
-$lzma = "lzma.exe"
 $lzo = "lzop.exe"
 $lzx = "unlzx.exe"
 $mht = "extractMHT.exe"
 $mht_ct = "cmdTotal.exe MHTUnp.wcx"
-$msi_msi2xml = "msi2xml.exe"
+;$msi_msi2xml = "msi2xml.exe"
 $msi_ct = "cmdTotal.exe msi.wcx"
+$msi_msix = "MsiX.exe"
+$nbh = "NBHextract.exe"
 $nrg = "nrg2iso.exe"
 $pea = "pea.exe" ;optional
 $peid = "peid.exe"
@@ -90,7 +93,7 @@ $rai = "RAIU.EXE"
 $rar = "unrar.exe"
 $sis = "cmdTotal.exe PDunSIS.wcx"
 $sit = "Expander.exe" ;optional
-$tar = "7z.exe"
+;$tar = "7z.exe"
 $trid = "trid.exe"
 $uharc = "UNUHARC06.EXE"
 $uharc04 = "UHARC04.EXE"
@@ -99,7 +102,7 @@ $upx = "upx.exe"
 $uu = "uudeview.exe"
 $wise_ewise = "e_wise_w.exe"
 $wise_wun = "wun.exe"
-$Z = "7z.exe"
+;$Z = "7z.exe"
 $zip = "unzip.exe"
 $zoo = "booz.exe"
 
@@ -160,12 +163,12 @@ elseif stringmid($outdir, 2, 1) <> ":" then
 endif
 
 ; Verify debug file output
-if stringright($debugdir, 1) <> '\' then $debugdir &= '\'
-$debugfile = filegetshortname($debugdir) & 'uniextract.txt'
+if stringright(EnvParse($debugdir), 1) <> '\' then $debugdir &= '\'
+$debugfile = filegetshortname(EnvParse($debugdir)) & 'uniextract.txt'
 $testdebug = fileopen($debugfile, 2)
 if $testdebug == -1 then
 	;terminate("debug", $debugdir, "")
-	msgbox(48, $title, t('CANNOT_DEBUG', _ArrayCreate($debugdir)))
+	msgbox(48, $title, t('CANNOT_DEBUG', CreateArray(EnvParse($debugdir))))
 	$debugdir = @tempdir & '\'
 	$debugfile = filegetshortname($debugdir) & 'uniextract.txt'
 else
@@ -205,7 +208,7 @@ if PathSearch($sit) then $sitinst = true
 ; First, check for file extensions that require special actiona
 ; Compound compressed files that require multiple actions
 if $fileext = "ipk" OR $fileext = "tbz2" OR $fileext = "tgz" _
-	OR $fileext = "tz" then
+	OR $fileext = "tz" OR $fileext = "tlz" OR $fileext = "txz" then
 	extract("ctar", 'Compressed Tar ' & t('TERM_ARCHIVE'))
 
 ; CD-ROM images - TrID is not reliable with these formats
@@ -221,7 +224,7 @@ elseif $fileext = "nrg" OR $fileext = "cue" then
 
 ; Second, analyze file using TrID
 else
-	splashtexton($title, t('SCANNING_FILE'), 300, 25, -1, $height, 16)
+	splashtexton($title, t('SCANNING_FILE'), 330, 50, -1, $height, 16)
 	filescan($file)
 endif
 
@@ -231,7 +234,7 @@ endif
 if $fileext = "exe" OR stringinstr($filetype, 'Executable', 0) then
 
 	; Check for known exe filetypes
-	$scantypes = _ArrayCreate('deep', 'hard', 'ext')
+	$scantypes = CreateArray('deep', 'hard', 'ext')
 	for $i = 0 to ubound($scantypes)-1
 		; Run PEiD scan
 		if $scantypes[$i] == 'hard' then
@@ -241,13 +244,16 @@ if $fileext = "exe" OR stringinstr($filetype, 'Executable', 0) then
 		endif
 		
 		; Perform additional tests if necessary
-		splashtexton($title, t('TERM_TESTING') & ' ' & t('TERM_UNKNOWN') & ' ' & t('TERM_EXECUTABLE'), 300, 25, -1, $height, 16)
+		splashtexton($title, t('TERM_TESTING') & ' ' & t('TERM_UNKNOWN') & ' ' & t('TERM_EXECUTABLE'), 330, 50, -1, $height, 16)
 		if $testinno AND NOT $innofailed then checkInno()
 		if $testarj AND NOT $arjfailed then checkArj()
 		if $testace AND NOT $acefailed then checkAce()
-		if $test7z AND NOT $7zfailed then check7z()
 		if $testzip AND NOT $zipfailed then checkZip()
 		if $testie AND NOT $iefailed then checkIE()
+
+		; Wait until after External scan is run before trying 7-Zip;
+		; new version is too agreessive
+		if $scantypes[$i] == 'ext' AND $test7z AND NOT $7zfailed then check7z()
 		splashoff()
 	next
 	$filetype = $tempftype
@@ -337,7 +343,7 @@ elseif $fileext = "lzh" OR $fileext = "lha" then
 	extract("7z", 'LZH ' & t('TERM_COMPRESSED'))
 
 elseif $fileext = "lzma" then
-	extract("lzma", 'LZMA ' & t('TERM_COMPRESSED'))
+	extract("7z", 'LZMA ' & t('TERM_COMPRESSED'))
 
 elseif $fileext = "lzo" then
 	extract("lzo", 'LZO ' & t('TERM_COMPRESSED'))
@@ -351,9 +357,15 @@ elseif $fileext = "mht" then
 elseif $fileext = "msi" then
 	extract("msi", 'Windows Installer (MSI) ' & t('TERM_PACKAGE'))
 	
+elseif $fileext = "msm" then
+	extract("msm", 'Windows Installer (MSM) ' & t('TERM_MERGE_MODULE'))
+	
 elseif $fileext = "msp" then
 	extract("msp", 'Windows Installer (MSP) ' & t('TERM_PATCH'))
 	
+elseif $fileext = "nbh" then
+	extract("nbh", 'NBH ' & t('TERM_IMAGE'))
+
 elseif $fileext = "pea" AND $peainst then
 	extract("pea", 'Pea ' & t('TERM_ARCHIVE'))
 
@@ -381,6 +393,9 @@ elseif $fileext = "uu" OR $fileext = "uue" _
 
 elseif $fileext = "wim" then
 	extract("7z", 'WIM ' & t('TERM_IMAGE'))
+
+elseif $fileext = "xz" then
+	extract("xz", 'XZ ' & t('TERM_COMPRESSED'))
 
 elseif $fileext = "yenc" OR $fileext = "ntx" then
 	extract("uu", 'yEnc ' & t('TERM_ENCODED'))
@@ -415,6 +430,15 @@ func FilenameParse($f)
 		$fileext = ''
 		$initoutdir = $filedir
 	endif
+endfunc
+
+; Parse string for environmental variables and return expanded output
+func EnvParse($string)
+	$arr = stringregexp($string, "%.*%", 2)
+	for $i = 0 to ubound($arr)-1
+		$string = stringreplace($string, $arr[$i], envget(stringreplace($arr[$i], "%", "")))
+	next
+	return $string
 endfunc
 
 ; Translate text
@@ -693,14 +717,17 @@ func filescan($f, $analyze = 1)
 		case stringinstr($filetype, "Microsoft Reader eBook", 0)
 			extract("lit", 'Microsoft LIT ' & t('TERM_EBOOK'))
 
+		case stringinstr($filetype, "Microsoft Windows Installer merge module", 0)
+			extract("msm", 'Windows Installer (MSM) ' & t('TERM_MERGE_MODULE'))
+
 		case stringinstr($filetype, "Microsoft Windows Installer package", 0)
 			extract("msi", 'Windows Installer (MSI) ' & t('TERM_PACKAGE'))
 
 		case stringinstr($filetype, "Microsoft Windows Installer patch", 0)
 			extract("msp", 'Windows Installer (MSP) ' & t('TERM_PATCH'))
 
-		case stringinstr($filetype, "Netopsystems FEAD Optimizer", 0)
-			if NOT $feadfailed then checkFEAD()
+		case stringinstr($filetype, "HTC NBH ROM Image", 0)
+			extract("nbh", 'NBH ' & t('TERM_IMAGE'))
 
 		case stringinstr($filetype, "Outlook Express E-mail folder", 0)
 			extract("dbx", 'Outlook Express ' & t('TERM_ARCHIVE'))
@@ -770,7 +797,7 @@ func filescan($f, $analyze = 1)
 
 		; Forced to bottom of list due to false positives
 		case stringinstr($filetype, "LZMA compressed file", 0)
-			checkLZMA()
+			check7z()
 
 		case stringinstr($filetype, "InstallShield setup", 0)
 			;extract("isexe", 'InstallShield ' & t('TERM_INSTALLER'))
@@ -781,7 +808,7 @@ endfunc
 
 ; Scan .exe file using PEiD
 func exescan($f, $scantype, $analyze = 1)
-	splashtexton($title, t('SCANNING_EXE', _ArrayCreate($scantype)), 300, 25, -1, $height, 16)
+	splashtexton($title, t('SCANNING_EXE', CreateArray($scantype)), 330, 50, -1, $height, 16)
 	; Backup existing PEiD options
 	$exsig = regread("HKCU\Software\PEiD", "ExSig")
 	$loadplugins = regread("HKCU\Software\PEiD", "LoadPlugins")
@@ -830,7 +857,7 @@ func exescan($f, $scantype, $analyze = 1)
 			extract("ie", 'Installer VISE ' & t('TERM_INSTALLER'))
 
 		case stringinstr($filetype, "InstallShield", 0)
-			extract("isexe", 'InstallShield ' & t('TERM_INSTALLER'))
+			if NOT $isfailed then extract("isexe", 'InstallShield ' & t('TERM_INSTALLER'))
 
 		case stringinstr($filetype, "KGB SFX", 0) 
 			if $kgbinst then extract("kgb", t('TERM_SFX') & ' KGB ' & t('TERM_PACKAGE'))
@@ -850,7 +877,7 @@ func exescan($f, $scantype, $analyze = 1)
 			extract("vssfxpath", 'Visual C++ ' & t('TERM_SFX') & '' & t('TERM_INSTALLER'))
 
 		case stringinstr($filetype, "Netopsystems FEAD Optimizer", 0)
-			if NOT $feadfailed then checkFEAD()
+			extract("fead", 'Netopsystems FEAD ' & t('TERM_PACKAGE'))
 
 		case stringinstr($filetype, "Nullsoft PiMP SFX", 0)
 			checkNSIS()
@@ -897,7 +924,7 @@ endfunc
 
 ; Determine if 7-zip can extract the file
 func check7z()
-	splashtexton($title, t('TERM_TESTING') & ' 7-Zip ' & t('TERM_INSTALLER'), 300, 25, -1, $height, 16)
+	splashtexton($title, t('TERM_TESTING') & ' 7-Zip ' & t('TERM_INSTALLER'), 330, 50, -1, $height, 16)
 	runwait($cmd & $7z & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
 	if stringinstr(filereadline($debugfile, 4), "Listing archive:", 0) then
 		; failsafe in case TrID misidentifies MS SFX hotfixes
@@ -916,6 +943,8 @@ func check7z()
 		splashoff()
 		if $fileext = "exe" then
 			extract("7z", '7-Zip ' & t('TERM_INSTALLER') & ' ' & t('TERM_PACKAGE'))
+		elseif $fileext = "xz" then
+			extract("xz", 'XZ ' & t('TERM_COMPRESSED'))
 		elseif $fileext = "z" then
 			extract("Z", 'LZW ' & t('TERM_COMPRESSED'))
 		endif
@@ -928,7 +957,7 @@ endfunc
 
 ; Determine if file is self-extracting ARJ archive
 func checkArj()
-	splashtexton($title, t('TERM_TESTING') & ' SFX ARJ ' & t('TERM_ARCHIVE'), 300, 25, -1, $height, 16)
+	splashtexton($title, t('TERM_TESTING') & ' SFX ARJ ' & t('TERM_ARCHIVE'), 330, 50, -1, $height, 16)
 	runwait($cmd & $arj & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
 	if stringinstr(filereadline($debugfile, 5), "Archive created:", 0) then
 		splashoff()
@@ -950,7 +979,7 @@ endfunc
 
 ; Determine if InstallExplorer can extract the file
 func checkIE()
-	splashtexton($title, t('TERM_TESTING') & ' InstallExplorer ' & t('TERM_INSTALLER'), 300, 25, -1, $height, 16)
+	splashtexton($title, t('TERM_TESTING') & ' InstallExplorer ' & t('TERM_INSTALLER'), 330, 50, -1, $height, 16)
 	runwait($cmd & $ie & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
 	if stringinstr(filereadline($debugfile, 11), '##', 0) then
 		$type = stringstripws(stringreplace(stringtrimleft(filereadline($debugfile, 11), stringinstr(filereadline($debugfile, 11), '-> ', 0) + 2), '##', ''), 3)
@@ -964,7 +993,7 @@ endfunc
 
 ; Determine if file is Inno Setup installer
 func checkInno()
-	splashtexton($title, t('TERM_TESTING') & ' Inno Setup ' & t('TERM_INSTALLER'), 300, 25, -1, $height, 16)
+	splashtexton($title, t('TERM_TESTING') & ' Inno Setup ' & t('TERM_INSTALLER'), 330, 50, -1, $height, 16)
 	runwait($cmd & $inno & ' "' & $file & '" >' & $debugfile, $filedir, @SW_HIDE)
 	if (stringinstr(filereadline($debugfile, 1), "Version detected:", 0) _
 		AND NOT (stringinstr(filereadline($debugfile, 2), "error", 0) _
@@ -990,7 +1019,7 @@ endfunc
 
 ; Determine if file is NSIS installer
 func checkNSIS()
-	splashtexton($title, t('TERM_TESTING') & ' NSIS ' & t('TERM_INSTALLER'), 300, 25, -1, $height, 16)
+	splashtexton($title, t('TERM_TESTING') & ' NSIS ' & t('TERM_INSTALLER'), 330, 50, -1, $height, 16)
 	runwait($cmd & $7z & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
 	if stringinstr(filereadline($debugfile, 4), "Listing archive:", 0) then
 		splashoff()
@@ -1004,7 +1033,7 @@ endfunc
 
 ; Determine if file is self-extracting Zip archive
 func checkZip()
-	splashtexton($title, t('TERM_TESTING') & ' SFX ZIP ' & t('TERM_ARCHIVE'), 300, 25, -1, $height, 16)
+	splashtexton($title, t('TERM_TESTING') & ' SFX ZIP ' & t('TERM_ARCHIVE'), 330, 50, -1, $height, 16)
 	runwait($cmd & $zip & ' -l "' & $file & '"' & $output, $filedir, @SW_HIDE)
 	if NOT stringinstr(filereadline($debugfile, 2), "signature not found", 0) then
 		splashoff()
@@ -1016,63 +1045,17 @@ func checkZip()
 	return false
 endfunc
 
-; Determine if file is FEAD package
-func checkFEAD()
-	splashtexton($title, t('TERM_TESTING') & ' Netopsystems FEAD ' & t('TERM_PACKAGE'), 300, 25, -1, $height, 16)
-	; check for FEAD match value of >10%; if not, consider false positive
-	$infile = fileopen($debugfile, 0)
-	$line = filereadline($infile)
-	do
-		if stringinstr($line, "Netopsystems FEAD Optimizer", 0) then
-			fileclose($infile)
-			filedelete($debugfile)
-			if int(stringstripws(stringleft($line, 3), 1)) >= 10 then
-				extract("fead", 'Netopsystems FEAD ' & t('TERM_PACKAGE'))
-			else
-				$feadfailed = true
-				return false
-			endif
-		endif
-		$line = filereadline($infile)
-	until @error
-	fileclose($infile)
-	$feadfailed = true
-	return false
-endfunc
-
-; Determine if file is compressed with LZMA
-func checkLZMA()
-	splashtexton($title, t('TERM_TESTING') & ' LZMA ' & t('TERM_COMPRESSED'), 300, 25, -1, $height, 16)
-	; check for LZMA match value of >10%; if not, consider false positive
-	$infile = fileopen($debugfile, 0)
-	$line = filereadline($infile)
-	do
-		if stringinstr($line, "LZMA compressed file", 0) then
-			fileclose($infile)
-			filedelete($debugfile)
-			if int(stringstripws(stringleft($line, 3), 1)) >= 10 then
-				extract("lzma", 'LZMA ' & t('TERM_COMPRESSED'))
-			else
-				$lzmafailed = true
-				return false
-			endif
-		endif
-		$line = filereadline($infile)
-	until @error
-	fileclose($infile)
-	$lzmafailed = true
-	return false
-endfunc
-
 ; Extract from known archive format
 func extract($arctype, $arcdisp)
 	; Display banner and create subdirectory
-	splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 300, 45, -1, $height, 16)
+	splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 330, 70, -1, $height, 16)
 	if stringright($outdir, 1) = '\' then $outdir = stringtrimright($outdir, 1)
 	if not fileexists($outdir) then
 		$validdir = dircreate($outdir)
 		if not $validdir then terminate("invaliddir", $outdir, "")
 		$createdir = true
+	else
+		$dirmtime = filegettime($outdir, 0, 1)
 	endif
 	$initdirsize = dirgetsize($outdir)
 	$tempoutdir = _TempFile($outdir, 'uni_', '')
@@ -1080,7 +1063,31 @@ func extract($arctype, $arcdisp)
 	; Extract archive based on filetype
 	select
 		case $arctype == "7z"
-			runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+			; Ignore duplicates for specific files: NSIS
+			local $appendargs = ''
+			if stringinstr($filetype, 'Nullsoft Install System', 0) then
+				$appendargs = '-aos'
+			endif
+			;runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $7z & ' x ' & $appendargs & ' "' & $file & '"', $outdir)
+
+			; Extract inner CPIO for RPMs
+			if stringinstr($filetype, 'RPM Linux Package', 0) then
+				if fileexists($outdir & '\' & $filename & '.cpio') then
+					runwait($cmd & $7z & ' x "' & $outdir & '\' & $filename & '.cpio"', $outdir)
+					filedelete($outdir & '\' & $filename & '.cpio')
+				endif
+
+			; Extract inner tarball for DEBs
+			elseif stringinstr($filetype, 'Debian Linux Package', 0) then
+				if fileexists($outdir & '\data.tar') then
+					runwait($cmd & $7z & ' x "' & $outdir & '\data.tar"', $outdir)
+					filedelete($outdir & '\data.tar')
+				endif
+
+
+			endif
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 		case $arctype == "ace"
 			opt("WinTitleMatchMode", 3)
@@ -1093,23 +1100,24 @@ func extract($arctype, $arcdisp)
 				endif
 				sleep(100)
 			wend
-			filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 		case $arctype == "arc"
 			runwait($cmd & $arc & ' x "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "arj"
-			runwait($cmd & $arj & ' x "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $arj & ' x "' & $file & '"', $outdir)
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 		case $arctype == "bin"
 			; Prompt user to continue
 			splashoff()
-			$convert =  msgbox(65, $title, t('CONVERT_CDROM', _ArrayCreate('BIN/CUE')))
+			$convert =  msgbox(65, $title, t('CONVERT_CDROM', CreateArray('BIN/CUE')))
 			if $convert <> 1 then
 				if $createdir then dirremove($outdir, 0)
 				terminate("silent", '', '')
 			endif
-			splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 300, 45, -1, $height, 16)
+			splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 330, 70, -1, $height, 16)
 
 			; Ensure that both .bin and .cue files exist
 			$binfile = $filedir & '\' & $filename & '.bin'
@@ -1122,7 +1130,7 @@ func extract($arctype, $arcdisp)
 			endif
 			if $missing then
 				splashoff()
-				msgbox(48, $title, t('CONVERT_BIN_MISSING', _ArrayCreate($filedir, $filename, $missing, $filename, $filename)))
+				msgbox(48, $title, t('CONVERT_BIN_MISSING', CreateArray($filedir, $filename, $missing, $filename, $filename)))
 				if $createdir then dirremove($outdir, 0)
 				terminate("silent", '', '')
 			endif
@@ -1162,11 +1170,13 @@ func extract($arctype, $arcdisp)
 				$isofilename = filefindnextfile($isofile)
 				fileclose($isofile)
 				controlsettext($title, '', 'Static1', t('EXTRACTING') & @CRLF & 'BIN/CUE CD-ROM ' & t('TERM_IMAGE') & ' (' & t('TERM_STAGE') & ' 2)')
-				runwait($cmd & $7z & ' x "' & $filedir & '\' & $isofilename & '"' & $output, $outdir)
+				;runwait($cmd & $7z & ' x "' & $filedir & '\' & $isofilename & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $filedir & '\' & $isofilename & '"', $outdir)
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 				; Prompt to keep .iso if extraction failed
 				if dirgetsize($outdir) <= $initdirsize then
-					$image = msgbox(52, $title, t('CONVERT_CDROM_STAGE2_FAILED', _ArrayCreate('BIN/CUE')))
+					$image = msgbox(52, $title, t('CONVERT_CDROM_STAGE2_FAILED', CreateArray('BIN/CUE')))
 					if $image == 7 then filedelete($filedir & '\' & $isofilename)
 					if $createdir then dirremove($outdir, 0)
 					terminate("silent", '', '')
@@ -1178,33 +1188,34 @@ func extract($arctype, $arcdisp)
 			endif
 
 		case $arctype == "bz2"
-			runwait($cmd & $bz2 & ' x "' & $file & '"' & $output, $outdir)
-			;if stringtrimleft($filename, stringinstr($filename, '.', 0, -1)) = "tar" then
-			;	runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename  & '"' & $output, $outdir)
-			;	filedelete($outdir & '\' & $filename)
-			;endif
+			;runwait($cmd & $bz2 & ' x "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
 			if fileexists($outdir & '\' & $filename) then
-				runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename & '"' & $output, $outdir)
+				;runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $outdir & '\' & $filename & '"', $outdir)
 				filedelete($outdir & '\' & $filename)
 			endif
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 		case $arctype == "cab"
 			if stringinstr($filetype, 'Type 1', 0) then
 				if $warnexecute then Warn_Execute($filename & '.exe /q /x:"<outdir>"')
 				runwait('"' & $file & '" /q /x:"' & $outdir & '"', $outdir)
 			else
-				runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+				;runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 			endif
 
 		case $arctype == "cdi"
 			; Prompt user to continue
 			splashoff()
-			$convert =  msgbox(65, $title, t('CONVERT_CDROM', _ArrayCreate('CDI')))
+			$convert =  msgbox(65, $title, t('CONVERT_CDROM', CreateArray('CDI')))
 			if $convert <> 1 then
 				if $createdir then dirremove($outdir, 0)
 				terminate("silent", '', '')
 			endif
-			splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 300, 45, -1, $height, 16)
+			splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 330, 70, -1, $height, 16)
 
 			; Begin conversion to .iso format
 			dircreate($tempoutdir)
@@ -1227,13 +1238,15 @@ func extract($arctype, $arcdisp)
 				while 1
 					$isofile = filefindnextfile($isos)
 					if @error then exitloop
-					runwait($cmd & $7z & ' x -aos "' & $tempoutdir & '\' & $isofile & '"' & $output, $outdir)
+					;runwait($cmd & $7z & ' x -aos "' & $tempoutdir & '\' & $isofile & '"' & $output, $outdir)
+					runwait($cmd & $7z & ' x "' & $tempoutdir & '\' & $isofile & '"', $outdir)
+					filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 				wend
 				fileclose($isos)
 
 				; Prompt to keep .iso if extraction failed
 				if dirgetsize($outdir) <= $initdirsize then
-					$image = msgbox(52, $title, t('CONVERT_CDROM_STAGE2_FAILED', _ArrayCreate('CDI')))
+					$image = msgbox(52, $title, t('CONVERT_CDROM_STAGE2_FAILED', CreateArray('CDI')))
 					if $image == 7 then dirremove($tempoutdir, 1)
 					if $createdir then dirremove($outdir, 0)
 					terminate("silent", '', '')
@@ -1246,7 +1259,7 @@ func extract($arctype, $arcdisp)
 			endif
 
 		case $arctype == "chm"
-			runwait($cmd & $chm & ' x "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
 			filedelete($outdir & '\#*')
 			filedelete($outdir & '\$*')
 			$dirs = filefindfirstfile($outdir & '\*')
@@ -1258,35 +1271,38 @@ func extract($arctype, $arcdisp)
 				until @error
 			endif
 			fileclose($dirs)
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 		case $arctype == "dbx"
 			runwait($cmd & $dbx & ' x "' & $file & '" "' & $outdir & '\"' & $output, $filedir)
 
-		;case $arctype == "expand"
-		;	runwait($cmd & $expand & ' -r "' & $file & '" "' & $outdir & '"' & $output, $outdir)
-
 		case $arctype == "fead"
 			if $warnexecute then Warn_Execute($filename & '.exe /s -nos_ne -nos_o"<outdir>"')
 			runwait($file & ' /s -nos_ne -nos_o"' & $tempoutdir & '"', $filedir)
+			filesetattrib($tempoutdir & '\*', '-R', 1)
 			MoveFiles($tempoutdir, $outdir)
 			dirremove($tempoutdir)
-			filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 			
 		case $arctype == "gz"
-			runwait($cmd & $gz & ' x "' & $file & '"' & $output, $outdir)
+			;runwait($cmd & $gz & ' x "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
 			if fileexists($outdir & '\' & $filename) AND stringtrimleft($filename, stringinstr($filename, '.', 0, -1)) = "tar" then
-				runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename & '"' & $output, $outdir)
+				;runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $outdir & '\' & $filename & '"', $outdir)
 				filedelete($outdir & '\' & $filename)
 			endif
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 			
 		case $arctype == "hlp"
-			runwait($cmd & $hlp & ' "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $hlp & ' "' & $file & '"', $outdir)
 			if dirgetsize($outdir) > $initdirsize then
 				dircreate($tempoutdir)
 				runwait($cmd & $hlp & ' /r /n "' & $file & '"' & $output, $tempoutdir)
 				filemove($tempoutdir & '\' & $filename & '.rtf', $outdir & '\' & $filename & '_Reconstructed.rtf')
 				dirremove($tempoutdir, 1)
 			endif
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 		; failsafe in case TrID misidentifies MS SFX hotfixes
 		case $arctype == "hotfix"
@@ -1314,8 +1330,9 @@ func extract($arctype, $arcdisp)
 				; Remove extracted files not listed by InstallExplorer
 				for $i = 1 to $exfiles[0]
 					for $j = 1 to ubound($iefiles) - 1
-						if $exfiles[$i] = $tempoutdir & '\' & $iefiles[$j] then _
+						if $exfiles[$i] = $tempoutdir & '\' & $iefiles[$j] then
 							continueloop 2
+						endif
 					next
 					filedelete($exfiles[$i])
 				next
@@ -1323,8 +1340,9 @@ func extract($arctype, $arcdisp)
 				; Remove duplicate directories
 				for $i = 1 to $exfiles[0]
 					if stringinstr(filegetattrib($exfiles[$i]), 'D') then
-						if dirgetsize($exfiles[$i]) == 0 then _
+						if dirgetsize($exfiles[$i]) == 0 then
 							dirremove($exfiles[$i], 1)
+						endif
 					endif
 				next
 			endif
@@ -1359,7 +1377,8 @@ func extract($arctype, $arcdisp)
 			$oldfiles = ReturnFiles($outdir)
 
 			; Decompress archive with 7-zip
-			runwait($cmd & $7z & ' x "' & $file & '"' & $output, $outdir)
+			;runwait($cmd & $7z & ' x "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
 
 			; Check for new files
 			$handle = filefindfirstfile($outdir & "\*")
@@ -1370,15 +1389,19 @@ func extract($arctype, $arcdisp)
 					if NOT stringinstr($oldfiles, $fname) then
 
 						; Check for supported archive format
-						runwait($cmd & $tar & ' l "' & $outdir & '\' & $fname & '"' & $output, $outdir, @SW_HIDE)
+						;runwait($cmd & $tar & ' l "' & $outdir & '\' & $fname & '"' & $output, $outdir, @SW_HIDE)
+						runwait($cmd & $7z & ' l "' & $outdir & '\' & $fname & '"' & $output, $outdir, @SW_HIDE)
 						if stringinstr(filereadline($debugfile, 4), "Listing archive:", 0) then
-							runwait($cmd & $tar & ' x "' & $outdir & '\' & $fname & '"' & $output, $outdir, @SW_HIDE)
+							;runwait($cmd & $tar & ' x "' & $outdir & '\' & $fname & '"' & $output, $outdir, @SW_HIDE)
+							runwait($cmd & $7z & ' x "' & $outdir & '\' & $fname & '"', $outdir, @SW_HIDE)
+							filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 							filedelete($outdir & '\' & $fname)
 						endif
 					endif
 				wend
 			endif
 			fileclose($handle)
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 		case $arctype == "is3arc"
 			$choice = MethodSelect($arctype, $arcdisp)
@@ -1419,7 +1442,7 @@ func extract($arctype, $arcdisp)
 				$line = filereadline($infile)
 				do
 					;_ArrayAdd($isfiles, stringtrimleft($line, stringinstr($line, ' ', 0, -1)))
-					_ArrayAdd($isfiles, stringtrimleft($line, stringinstr($line,47)))
+					_ArrayAdd($isfiles, stringtrimleft($line, 47))
 					$line = filereadline($infile)
 				until @error
 				fileclose($infile)
@@ -1442,6 +1465,7 @@ func extract($arctype, $arcdisp)
 
 				; User-specified false positive; return for additional analysis
 				if $choice == 'not InstallShield' then
+					$isfailed = true
 					return false
 
 				; Extract using isxunpack
@@ -1462,7 +1486,7 @@ func extract($arctype, $arcdisp)
 				elseif $choice == 'InstallShield /b' then
 					; Run installer and wait for temp files to be copied
 					if $warnexecute then Warn_Execute($filename & '.exe /b"<outdir>" /v"/l "<debugfile>""')
-					splashtexton($title, t('INIT_WAIT'), 300, 40, -1, $height, 16)
+					splashtexton($title, t('INIT_WAIT'), 330, 70, -1, $height, 16)
 					run('"' & $file & '" /b"' & $tempoutdir & '" /v"/l "' & $debugfile & '""', $filedir)
 
 					; Wait for matching windows for up to 20 seconds (40 * .5)
@@ -1485,8 +1509,9 @@ func extract($arctype, $arcdisp)
 										$ishandle = filefindfirstfile($isdir & "\*")
 										$fname = filefindnextfile($ishandle)
 										do
-											if $fname <> $msiname then _
+											if $fname <> $msiname then
 												filecopy($isdir & "\" & $fname, $tempoutdir)
+											endif
 											$fname = filefindnextfile($ishandle)
 										until @error
 										fileclose($ishandle)
@@ -1497,7 +1522,7 @@ func extract($arctype, $arcdisp)
 
 							; Move files to outdir
 							splashoff()
-							msgbox(32, $title, t('INIT_COMPLETE', _ArrayCreate(t('TERM_SUCCEEDED'))))
+							msgbox(32, $title, t('INIT_COMPLETE', CreateArray(t('TERM_SUCCEEDED'))))
 							MoveFiles($tempoutdir, $outdir)
 							dirremove($tempoutdir, 1)
 							$success = true
@@ -1508,7 +1533,7 @@ func extract($arctype, $arcdisp)
 					; Not a supported installer
 					if NOT $success then
 						splashoff()
-						msgbox(48, $title, t('INIT_COMPLETE', _ArrayCreate(t('TERM_FAILED'))))
+						msgbox(48, $title, t('INIT_COMPLETE', CreateArray(t('TERM_FAILED'))))
 					endif
 				endif
 			endif
@@ -1525,9 +1550,6 @@ func extract($arctype, $arcdisp)
 
 		case $arctype == "lit"
 			runwait($cmd & $lit & ' "' & $file & '" "' & $outdir & '"' & $output, $outdir)
-
-		case $arctype == "lzma"
-			runwait($cmd & $lzma & ' d "' & $file & '" "' & $outdir & '\' & $filename & '"' & $output, $filedir)
 
 		case $arctype == "lzo"
 			runwait($cmd & $lzo & ' -d -p"' & $outdir & '" "' & $file & '"' & $output, $filedir)
@@ -1559,13 +1581,19 @@ func extract($arctype, $arcdisp)
 				runwait('msiexec.exe /a "' & $file & '" /qb /l ' & $debugfile & ' TARGETDIR="' & $outdir & '"', $filedir)
 			
 			; Extract with msi2xml
-			elseif $choice == 'msi2xml' then
-				runwait($cmd & $msi_msi2xml & ' -b streams -c files "' & $file & '"' & $output, $outdir)
+			;elseif $choice == 'msi2xml' then
+			;	runwait($cmd & $msi_msi2xml & ' -b streams -c files "' & $file & '"' & $output, $outdir)
 
 				; Append missing file extensions
-				if $appendext then
-					AppendExtensions($outdir)
-				endif
+				;if $appendext then
+				;	AppendExtensions($outdir)
+				;endif
+
+			; Extract with MsiX
+			elseif $choice == 'MsiX' then
+				local $appendargs = ''
+				if $appendext then $appendargs = '/ext'
+				runwait($cmd & $msi_msix & ' "' & $file & '" /out "' & $outdir & '" ' & $appendargs & $output, $filedir)
 
 			; Extract with MSI Total Commander plugin
 			elseif $choice == 'MSI TC Packer' then
@@ -1577,7 +1605,9 @@ func extract($arctype, $arcdisp)
 				for $i = 1 to $cabfiles[0]
 					filescan($cabfiles[$i], 0)
 					if stringinstr($filetype, "Microsoft Cabinet Archive", 0) then
-						runwait($cmd & $7z & ' x -aos "' & $cabfiles[$i] & '"' & $output, $tempoutdir)
+						;runwait($cmd & $7z & ' x -aos "' & $cabfiles[$i] & '"' & $output, $tempoutdir)
+						runwait($cmd & $7z & ' x "' & $cabfile[$i] & '"', $outdir)
+						filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 						filedelete($cabfiles[$i])
 					endif
 				next
@@ -1590,7 +1620,13 @@ func extract($arctype, $arcdisp)
 				; Move files to output directory and remove tempdir
 				MoveFiles($tempoutdir, $outdir)
 				dirremove($tempoutdir)
+
 			endif
+
+		case $arctype == "msm"
+			local $appendargs = ''
+			if $appendext then $appendargs = '/ext'
+			runwait($cmd & $msi_msix & ' "' & $file & '" /out "' & $outdir & '" ' & $appendargs & $output, $filedir)
 
 		case $arctype == "msp"
 			$choice = MethodSelect($arctype, $arcdisp)
@@ -1600,9 +1636,16 @@ func extract($arctype, $arcdisp)
 			if $choice == 'MSI TC Packer' then
 				runwait($cmd & $msi_ct & ' x "' & $file & '" "' & $tempoutdir & '\"' & $output, $filedir)
 
+			; Extract with MsiX
+			elseif $choice == 'MsiX' then
+				runwait($cmd & $msi_msix & ' "' & $file & '" /out "' & $tempoutdir & '"' & $output, $filedir)
+
 			; Extract using 7-Zip
 			elseif $choice == '7-Zip' then
-				runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $tempoutdir)
+				;runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $tempoutdir)
+				runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
+
 			endif
 
 			; Regardless of method, extract files from extracted CABs
@@ -1610,7 +1653,9 @@ func extract($arctype, $arcdisp)
 			for $i = 1 to $cabfiles[0]
 				filescan($cabfiles[$i], 0)
 				if stringinstr($filetype, "Microsoft Cabinet Archive", 0) then
-					runwait($cmd & $7z & ' x -aos "' & $cabfiles[$i] & '"' & $output, $tempoutdir)
+					;runwait($cmd & $7z & ' x -aos "' & $cabfiles[$i] & '"' & $output, $tempoutdir)
+					runwait($cmd & $7z & ' x "' & $cabfiles[$i] & '"', $outdir)
+					filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 					filedelete($cabfiles[$i])
 				endif
 			next
@@ -1624,15 +1669,18 @@ func extract($arctype, $arcdisp)
 			MoveFiles($tempoutdir, $outdir)
 			dirremove($tempoutdir)
 
+		case $arctype == "nbh"
+			runwait($cmd & $nbh & ' "' & $file & '"', $outdir)
+
 		case $arctype == "nrg"
 			; Prompt user to continue
 			splashoff()
-			$convert =  msgbox(65, $title, t('CONVERT_CDROM', _ArrayCreate('NRG')))
+			$convert =  msgbox(65, $title, t('CONVERT_CDROM', CreateArray('NRG')))
 			if $convert <> 1 then
 				if $createdir then dirremove($outdir, 0)
 				terminate("silent", '', '')
 			endif
-			splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 300, 45, -1, $height, 16)
+			splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 330, 70, -1, $height, 16)
 
 			; Begin conversion to .iso format
 			controlsettext($title, '', 'Static1', t('EXTRACTING') & @CRLF & 'NRG CD-ROM ' & t('TERM_IMAGE') & ' (' & t('TERM_STAGE') & ' 1)')
@@ -1649,11 +1697,13 @@ func extract($arctype, $arcdisp)
 			; Otherwise, begin extraction from .iso
 			else
 				controlsettext($title, '', 'Static1', t('EXTRACTING') & @CRLF & 'NRG CD-ROM ' & t('TERM_IMAGE') & ' (' & t('TERM_STAGE') & ' 2)')
-				runwait($cmd & $7z & ' x "' & $isofile & '"' & $output, $outdir)
+				;runwait($cmd & $7z & ' x "' & $isofile & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $isofile & '"', $outdir)
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 				; Prompt to keep .iso if extraction failed
 				if dirgetsize($outdir) <= $initdirsize then
-					$image = msgbox(52, $title, t('CONVERT_CDROM_STAGE2_FAILED', _ArrayCreate('NRG')))
+					$image = msgbox(52, $title, t('CONVERT_CDROM_STAGE2_FAILED', CreateArray('NRG')))
 					if $image == 7 then filedelete($isofile)
 					if $createdir then dirremove($outdir, 0)
 					terminate("silent", '', '')
@@ -1670,8 +1720,9 @@ func extract($arctype, $arcdisp)
 			winwait("PEA", "", 20)
 			$windows = winlist("PEA")
 			for $i = 0 to $windows[0][0]
-				if wingetprocess($windows[$i][0]) == $pid then _
+				if wingetprocess($windows[$i][0]) == $pid then
 					$peatitle = $windows[$i][0]
+				endif
 			next
 			while processexists($pid)
 				$status = controlgettext($peatitle, '', 'Button1')
@@ -1680,7 +1731,7 @@ func extract($arctype, $arcdisp)
 			wend
 			MoveFiles($tempoutdir, $outdir)
 			dirremove($tempoutdir)
-			filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 		case $arctype == "rar"
 			runwait($cmd & $rar & ' x "' & $file & '"' & $output, $outdir)
@@ -1688,7 +1739,7 @@ func extract($arctype, $arcdisp)
 		case $arctype == "robo"
 			if $warnexecute then Warn_Execute($filename & '.exe /unpack="<outdir>"')
 			runwait($file & ' /unpack="' & $outdir & '"', $filedir)
-			filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 		case $arctype == "sis"
 			runwait($cmd & $sis & ' x "' & $file & '" "' & $outdir & '\"' & $output, $filedir)
@@ -1700,7 +1751,7 @@ func extract($arctype, $arcdisp)
 			filemove($tempoutdir & '\' & $filename & '.' & $fileext, $file)
 			MoveFiles($tempoutdir & '\' & $filename, $outdir)
 			dirremove($tempoutdir, 1)
-			filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 		case $arctype == "superdat"
 			if $warnexecute then Warn_Execute($filename & '.exe /e "<outdir>"')
@@ -1709,12 +1760,16 @@ func extract($arctype, $arcdisp)
 
 		case $arctype == "tar"
 			if $fileext = "tar" then
-				runwait($cmd & $tar & ' x "' & $file & '"' & $output, $outdir)
+				;runwait($cmd & $tar & ' x "' & $file & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
 			else
-				runwait($cmd & $7z & ' x "' & $file & '"' & $output, $outdir)
-				runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename  & '.tar"' & $output, $outdir)
+				;runwait($cmd & $7z & ' x "' & $file & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
+				;runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename  & '.tar"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $outdir & '\' & $filename  & '.tar"', $outdir)
 				filedelete($outdir & '\' & $filename & '.tar')
 			endif
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 		case $arctype == "vssfx"
 			if $warnexecute then Warn_Execute($filename & '.exe /extract')
@@ -1754,20 +1809,20 @@ func extract($arctype, $arcdisp)
 				endif
 				MoveFiles($tempoutdir, $outdir)
 				dirremove($tempoutdir)
-				filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 			; Extract using the /x switch
 			elseif $choice == 'Wise Installer /x' then
 				if $warnexecute then Warn_Execute($filename & '.exe /x <outdir>')
 				runwait($file & ' /x ' & $outdir, $filedir)
-				filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
 			; Attempt to extract MSI
 			elseif $choice == 'Wise MSI' then
 
 				; Prompt to continue
 				splashoff()
-				$continue = msgbox(65, $title, t('WISE_MSI_PROMPT', _ArrayCreate($name)))
+				$continue = msgbox(65, $title, t('WISE_MSI_PROMPT', CreateArray($name)))
 				if $continue <> 1 then
 					if $createdir then dirremove($outdir, 0)
 					terminate("silent", '', '')
@@ -1775,7 +1830,7 @@ func extract($arctype, $arcdisp)
 
 				; First, check for any files that are already in extraction dir
 				if $warnexecute then Warn_Execute($filename & '.exe /?')
-				splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 300, 45, -1, $height, 16)
+				splashtexton($title, t('EXTRACTING') & @CRLF & $arcdisp, 330, 70, -1, $height, 16)
 				$oldfiles = ReturnFiles(@commonfilesdir & "\Wise Installation Wizard")
 
 				; Run installer
@@ -1795,13 +1850,16 @@ func extract($arctype, $arcdisp)
 				MoveFiles(@commonfilesdir & "\Wise Installation Wizard", $outdir, 0, $oldfiles)
 				dirremove(@commonfilesdir & "\Wise Installation Wizard", 0)
 				winclose("Windows Installer")
-				filewriteline($debugfile, t('CANNOT_LOG', _ArrayCreate($arcdisp)))
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray($arcdisp)))
 
-			; Extract using the /x switch
+			; Extract using unzip, falling back to 7-Zip
 			elseif $choice == 'Unzip' then
 				$return = runwait($cmd & $zip & ' -x "' & $file & '"', $outdir)
-				if $return <> 0 then _
-					runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+				if $return <> 0 then
+					;runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+					runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
+					filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
+				endif
 			endif
 
 			; Append missing file extensions
@@ -1826,17 +1884,30 @@ func extract($arctype, $arcdisp)
 		case $arctype == "uu"
 			runwait($cmd & $uu & ' -p "' & $outdir & '" -i "' & $file & '"', $filedir)
 
-		case $arctype == "Z"
-			runwait($cmd & $Z & ' x "' & $file & '"' & $output, $outdir)
-			if stringtrimleft($filename, stringinstr($filename, '.', 0, -1)) = "tar" then
-				runwait($cmd & $tar & ' x "' & $outdir & '\' & $filename & '"' & $output, $outdir)
+		case $arctype == "xz"
+			runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
+			if fileexists($outdir & '\' & $filename) AND stringtrimleft($filename, stringinstr($filename, '.', 0, -1)) = "tar" then
+				runwait($cmd & $7z & ' x "' & $outdir & '\' & $filename & '"', $outdir)
 				filedelete($outdir & '\' & $filename)
 			endif
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
+
+		case $arctype == "Z"
+			;runwait($cmd & $Z & ' x "' & $file & '"' & $output, $outdir)
+			runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
+			if fileexists($outdir & '\' & $filename) AND stringtrimleft($filename, stringinstr($filename, '.', 0, -1)) = "tar" then
+				runwait($cmd & $7z & ' x "' & $outdir & '\' & $filename & '"', $outdir)
+				filedelete($outdir & '\' & $filename)
+			endif
+			filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
 
 		case $arctype == "zip"
-			$return = runwait($cmd & $zip & ' -x "' & $file & '"', $outdir)
-			if $return <> 0 then _
-				runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+			$return = runwait($cmd & $zip & ' -x "' & $file & '"' & $output, $outdir)
+			if $return > 1 then
+				;runwait($cmd & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+				runwait($cmd & $7z & ' x "' & $file & '"', $outdir)
+				filewriteline($debugfile, t('CANNOT_LOG', CreateArray("7-Zip " & $arcdisp)))
+			endif
 
 		case $arctype == "zoo"
 			dircreate($tempoutdir)
@@ -1850,10 +1921,17 @@ func extract($arctype, $arcdisp)
 	
 	; Check for successful output
 	splashoff()
-	if dirgetsize($outdir) <= $initdirsize then
-		if $createdir then dirremove($outdir, 0)
-		if $arctype == "ace" AND $fileext = "exe" then return false
-		terminate("failed", $file, $arcdisp)
+	if $createdir then
+		if dirgetsize($outdir) <= $initdirsize then
+			if $createdir then dirremove($outdir, 0)
+			if $arctype == "ace" AND $fileext = "exe" then return false
+			terminate("failed", $file, $arcdisp)
+		endif
+	else
+		;msgbox(0, 'Test', "new = " & filegettime($outdir, 0, 1) & @CRLF & "old   = " & $dirmtime)
+		if filegettime($outdir, 0, 1) == $dirmtime then
+			terminate("failed", $file, $arcdisp)
+		endif
 	endif
 	terminate("success", "", "")
 endfunc
@@ -1868,7 +1946,7 @@ func unpack()
 	endif
 
 	; prompt to continue
-	$unpack =  msgbox(65, $title, t('UNPACK_PROMPT', _ArrayCreate($packer, $filedir, $filename, $fileext)))
+	$unpack =  msgbox(65, $title, t('UNPACK_PROMPT', CreateArray($packer, $filedir, $filename, $fileext)))
 	if $unpack <> 1 then return
 
 	; unpack file
@@ -1880,14 +1958,14 @@ func unpack()
 			filemove($filedir & "\" & $filename & "." & $tempext, $file)
 			terminate("success", "", "")
 		else
-			msgbox(48, $title, t('UNPACK_FAILED', _ArrayCreate($file)))
+			msgbox(48, $title, t('UNPACK_FAILED', CreateArray($file)))
 			terminate("silent", '', '')
 		endif
 	elseif $packer == "ASPack" then
 		runwait($cmd & $aspack & ' "' & $file & '" "' & $filedir & '\' & $filename & '_' & t('TERM_UNPACKED') & '.exe" /NO_PROMPT', $filedir)
 		if fileexists($filedir & "\" & $filename & "_" & t('TERM_UNPACKED') & ".exe") then
 			terminate("success", "", "")
-			msgbox(48, $title, t('UNPACK_FAILED', _ArrayCreate($file)))
+			msgbox(48, $title, t('UNPACK_FAILED', CreateArray($file)))
 			terminate("silent", '', '')
 		endif
 	endif
@@ -2035,27 +2113,27 @@ func terminate($status, $fname, $id)
 		; Display usage information and exit
 		case $status == "syntax"
 			$syntax = t('HELP_SUMMARY')
-			$syntax &= t('HELP_SYNTAX', _ArrayCreate(@scriptname))
+			$syntax &= t('HELP_SYNTAX', CreateArray(@scriptname))
 			$syntax &= t('HELP_ARGUMENTS')
 			$syntax &= t('HELP_HELP')
 			$syntax &= t('HELP_PREFS')
 			$syntax &= t('HELP_FILENAME')
 			$syntax &= t('HELP_DESTINATION')
-			$syntax &= t('HELP_SUB', _ArrayCreate($name))
+			$syntax &= t('HELP_SUB', CreateArray($name))
 			$syntax &= t('HELP_EXAMPLE1')
-			$syntax &= t('HELP_EXAMPLE2', _ArrayCreate(@scriptname))
-			$syntax &= t('HELP_NOARGS', _ArrayCreate($name))
+			$syntax &= t('HELP_EXAMPLE2', CreateArray(@scriptname))
+			$syntax &= t('HELP_NOARGS', CreateArray($name))
 			msgbox(48, $title, $syntax)
 			$exitcode = 0
 
 		; Debug file is not writable
 		case $status == "debug"
-			msgbox(48, $title, t('CANNOT_DEBUG', _ArrayCreate($fname, $name)))
+			msgbox(48, $title, t('CANNOT_DEBUG', CreateArray($fname, $name)))
 			$exitcode = 2
 
 		; Display error information and exit
 		case $status == "unknownexe"
-			$prompt = msgbox(305, $title, t('CANNOT_EXTRACT', _ArrayCreate($file, $id)))
+			$prompt = msgbox(305, $title, t('CANNOT_EXTRACT', CreateArray($file, $id)))
 			if $prompt == 1 then
 				run($peid & ' "' & $file & '"', $filedir)
 				winwait($peidtitle)
@@ -2063,18 +2141,18 @@ func terminate($status, $fname, $id)
 			endif
 			$exitcode = 3
 		case $status == "unknownext"
-			msgbox(48, $title, t('UNKNOWN_EXT', _ArrayCreate($file)))
+			msgbox(48, $title, t('UNKNOWN_EXT', CreateArray($file)))
 			$exitcode = 4
 		case $status == "invaliddir"
-			msgbox(48, $title, t('INVALID_DIR', _ArrayCreate($fname)))
+			msgbox(48, $title, t('INVALID_DIR', CreateArray($fname)))
 			$exitcode = 5
 
 		; Display failed attempt information and exit
 		case $status == "failed"
 			; Convert log to DOS format
-			runwait($cmd & 'type ' & filegetshortname($debugfile) & ' >' & filegetshortname($debugdir) & 'uniextract_temp.txt', $debugdir, @SW_HIDE)
-			filemove(filegetshortname($debugdir) & 'uniextract_temp.txt', $debugfile, 1)
-			$prompt = msgbox(305, $title, t('EXTRACT_FAILED', _ArrayCreate($file, $id, filegetlongname($debugfile))))
+			runwait($cmd & 'type ' & filegetshortname($debugfile) & ' >' & filegetshortname(EnvParse($debugdir)) & 'uniextract_temp.txt', EnvParse($debugdir), @SW_HIDE)
+			filemove(filegetshortname(EnvParse($debugdir)) & 'uniextract_temp.txt', $debugfile, 1)
+			$prompt = msgbox(305, $title, t('EXTRACT_FAILED', CreateArray($file, $id, filegetlongname($debugfile))))
 			if $prompt == 1 then
 				shellexecute($debugfile)
 			endif
@@ -2097,8 +2175,8 @@ endfunc
 func MethodSelect($format, $splashdisp)
 	; Set info base on format
 	splashoff()
-	$base_height = 120
-	$base_radio = 90
+	$base_height = 130
+	$base_radio = 100
 	$url = 'dummy'
 	if $format == 'wise' then
 		$select_type = 'Wise Installer'
@@ -2119,19 +2197,23 @@ func MethodSelect($format, $splashdisp)
 		dim $method[3][2], $select[3]
 		$method[0][0] = 'MSI'
 		$method[0][1] = 'METHOD_ADMIN_RADIO'
-		$method[1][0] = 'msi2xml'
+		$method[1][0] = 'MsiX'
 		$method[1][1] = 'METHOD_EXTRACTION_RADIO'
+		;$method[1][0] = 'msi2xml'
+		;$method[1][1] = 'METHOD_EXTRACTION_RADIO'
 		$method[2][0] = 'MSI TC Packer'
 		$method[2][1] = 'METHOD_EXTRACTION_RADIO'
-		$base_height += 15
-		$base_radio += 15
+		;$base_height += 15
+		;$base_radio += 15
 	elseif $format == 'msp' then
 		$select_type = 'MSP Package'
-		dim $method[2][2], $select[2]
+		dim $method[3][2], $select[3]
 		$method[0][0] = 'MSI TC Packer'
 		$method[0][1] = 'METHOD_EXTRACTION_RADIO'
-		$method[1][0] = '7-Zip'
+		$method[1][0] = 'MsiX'
 		$method[1][1] = 'METHOD_EXTRACTION_RADIO'
+		$method[2][0] = '7-Zip'
+		$method[2][1] = 'METHOD_EXTRACTION_RADIO'
 	elseif $format == 'mht' then
 		$select_type = 'MHTML Archive'
 		dim $method[2][2], $select[2]
@@ -2160,8 +2242,9 @@ func MethodSelect($format, $splashdisp)
 	; Create GUI and set header information
 	opt("GUIOnEventMode", 0)
 	local $guimethod = GUICreate($title, 330, $base_height + (ubound($method) * 20))
-	$header = GUICtrlCreateLabel(t('METHOD_HEADER', _ArrayCreate($select_type)), 5, 5, 320, 20)
-	GUICtrlCreateLabel(t('METHOD_TEXT_LABEL', _ArrayCreate($name, $select_type, $name)), 5, 25, 320, 65, $SS_LEFT)
+	$header = GUICtrlCreateLabel(t('METHOD_HEADER', CreateArray($select_type)), 5, 5, 320, 20)
+	GUICtrlCreateLabel(t('METHOD_TEXT_LABEL', CreateArray($name, $select_type, $name)), 5, 25, 320, 65, $SS_LEFT)
+	#cs
 	if $format == 'msi' then
 		local $note = GUICtrlCreateLabel(t('METHOD_MSI_NOTE_LABEL'), 5, 80, -1, 20)
 		local $requirespos = GetPos($guimethod, $note, 0)
@@ -2169,28 +2252,31 @@ func MethodSelect($format, $splashdisp)
 		local $urlpos = GetPos($guimethod, $requires, -5)
 		local $url = GUICtrlCreateLabel(t('METHOD_MSI_URL_LABEL'), $urlpos, 80, -1, 20)
 	endif
+	#ce
 
 	; Create radio selection options
-	GUICtrlCreateGroup(t('METHOD_RADIO_LABEL'), 5, $base_radio, 180, 25 + (ubound($method) * 20))
+	GUICtrlCreateGroup(t('METHOD_RADIO_LABEL'), 5, $base_radio, 215, 25 + (ubound($method) * 20))
 	for $i = 0 to ubound($method)-1
-		$select[$i] = GUICtrlCreateRadio(t($method[$i][1], _ArrayCreate($method[$i][0])), 10, $base_radio + 20 + ($i * 20), 170, 20)
+		$select[$i] = GUICtrlCreateRadio(t($method[$i][1], CreateArray($method[$i][0])), 10, $base_radio + 20 + ($i * 20), 205, 20)
 	next
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 
 	; Create buttons
-	$ok = GUICtrlCreateButton(t('OK_BUT'), 215, $base_radio - 10 + (ubound($method) * 10), 80, 20)
-	$cancel = GUICtrlCreateButton(t('CANCEL_BUT'), 215, $base_radio - 10 + (ubound($method) * 10) + 30, 80, 20)
+	$ok = GUICtrlCreateButton(t('OK_BUT'), 235, $base_radio - 10 + (ubound($method) * 10), 80, 20)
+	$cancel = GUICtrlCreateButton(t('CANCEL_BUT'), 235, $base_radio - 10 + (ubound($method) * 10) + 30, 80, 20)
 
 	; Set properties
 	GUICtrlSetFont($header, -1, 1200)
 	GUICtrlSetState($select[0], $GUI_CHECKED)
 	GUICtrlSetState($ok, $GUI_DEFBUTTON)
+	#cs
 	if $format == 'msi' then
 		GUICtrlSetFont($note, 8.7, 800)
 		GUICtrlSetFont($url, 8.7, -1, 4)
 		GUICtrlSetColor($url, 0x0000ff)
 		GUICtrlSetCursor($url, 0)
 	endif
+	#ce
 
 	; Display GUI and wait for action
 	GUISetState(@SW_SHOW)
@@ -2202,7 +2288,7 @@ func MethodSelect($format, $splashdisp)
 				for $i = 0 to ubound($method)-1
 					if GUICtrlRead($select[$i]) == $GUI_CHECKED then
 						GUIDelete($guimethod)
-						splashtexton($title, t('EXTRACTING') & @CRLF & $splashdisp, 300, 45, -1, $height, 16)
+						splashtexton($title, t('EXTRACTING') & @CRLF & $splashdisp, 330, 70, -1, $height, 16)
 						return $method[$i][0]
 					endif
 				next
@@ -2213,8 +2299,8 @@ func MethodSelect($format, $splashdisp)
 				terminate("silent", '', '')
 
 			; Launch URL in browser (only valid for MSI)
-			case $action == $url
-				shellexecute($msxml4)
+			;case $action == $url
+				;shellexecute($msxml_down)
 
 		endselect
 	wend
@@ -2222,12 +2308,20 @@ endfunc
 
 ; Warn user before executing files for extraction
 func Warn_Execute($command)
-	$prompt = msgbox(49, $title, t('WARN_EXECUTE', _ArrayCreate($command)));
+	$prompt = msgbox(49, $title, t('WARN_EXECUTE', CreateArray($command)));
 	if $prompt <> 1 then
 		if $createdir then dirremove($outdir, 0)
 		terminate('silent', '', '')
 	endif
 	return true
+endfunc
+
+; Create array on the fly
+; Code based on _CreateArray UDF, which has been deprecated
+func CreateArray($i0, $i1 = 0, $i2 = 0, $i3 = 0, $i4 = 0, $i5 = 0, $i6 = 0, $i7 = 0, $i8 = 0, $i9 = 0)
+	local $arr[10] = [$i0, $i1, $i2, $i3, $i4, $i5, $i6, $i7, $i8, $i9]
+	redim $arr[@numparams]
+	return $arr
 endfunc
 
 
@@ -2245,12 +2339,12 @@ func CreateGUI()
 	local $editmenu = GUICtrlCreateMenu(t('MENU_EDIT_LABEL'))
 	local $prefsitem = GUICtrlCreateMenuItem(t('MENU_EDIT_PREFS_LABEL'), $editmenu)
 	local $helpmenu = GUICtrlCreateMenu(t('MENU_HELP_LABEL'))
-	local $webitem = GUICtrlCreateMenuItem(t('MENU_HELP_WEB_LABEL', _ArrayCreate($name)), $helpmenu)
+	local $webitem = GUICtrlCreateMenuItem(t('MENU_HELP_WEB_LABEL', CreateArray($name)), $helpmenu)
 
 	; File controls
 	GUICtrlCreateLabel(t('MAIN_FILE_LABEL'), 5, 5, -1, 15)
 	if $history then
-		global $filecont = GUICtrlCreateCombo("", 5, 20, 260, 20 * CharCount($langlist, '|'))
+		global $filecont = GUICtrlCreateCombo("", 5, 20, 260, 20)
 	else
 		global $filecont = GUICtrlCreateInput("", 5, 20, 260, 20)
 	endif
@@ -2259,7 +2353,7 @@ func CreateGUI()
 	; Directory controls
 	GUICtrlCreateLabel(t('MAIN_DEST_DIR_LABEL'), 5, 45, -1, 15)
 	if $history then
-		global $dircont = GUICtrlCreateCombo("", 5, 60, 260, 20 * CharCount($langlist, '|'))
+		global $dircont = GUICtrlCreateCombo("", 5, 60, 260, 20)
 	else
 		global $dircont = GUICtrlCreateInput("", 5, 60, 260, 20)
 	endif
@@ -2368,10 +2462,10 @@ endfunc
 
 ; Prompt user for debug file directory
 func GUI_Prefs_Debug()
-	if fileexists(GUICtrlRead($debugcont)) then
-		$defdir = GUICtrlRead($debugcont)
-	elseif fileexists($debugdir) then
-		$defdir = $debugdir
+	if fileexists(EnvParse(GUICtrlRead(($debugcont)))) then
+		$defdir = EnvParse(GUICtrlRead($debugcont))
+	elseif fileexists(EnvParse($debugdir)) then
+		$defdir = EnvParse($debugdir)
 	else
 		$defdir = @tempdir
 	endif
@@ -2391,29 +2485,34 @@ endfunc
 ; Exit preferences GUI if Cancel clicked or window closed
 func GUI_Prefs_OK()
 	; universal preferences
-	if fileexists(GUICtrlRead($debugcont)) AND stringinstr(filegetattrib(GUICtrlRead($debugcont)), 'D') then
+	$redrawgui = false
+	if fileexists(EnvParse(GUICtrlRead($debugcont))) AND stringinstr(filegetattrib(EnvParse(GUICtrlRead($debugcont))), 'D') then
 		$debugdir = GUICtrlRead($debugcont)
 	else
-		msgbox(48, $title, t('INVALID_DIR_SELECTED', _ArrayCreate(GUICtrlRead($debugcont))))
+		msgbox(48, $title, t('INVALID_DIR_SELECTED', CreateArray(GUICtrlRead($debugcont))))
 		return
 	endif
 	if GUICtrlRead($historyopt) == $GUI_CHECKED then
-		$history = 1
+		if $history == 0 then
+			$history = 1
+			$redrawgui = true
+		endif
 	else
-		$history = 0
-		if $globalprefs then
-			inidelete($prefs, "File History")
-			inidelete($prefs, "Directory History")
-		else
-			regdelete($reg & '\File')
-			regdelete($reg & '\Directory')
+		if $history == 1 then
+			$history = 0
+			if $globalprefs then
+				inidelete($prefs, "File History")
+				inidelete($prefs, "Directory History")
+			else
+				regdelete($reg & '\File')
+				regdelete($reg & '\Directory')
+			endif
+			$redrawgui = true
 		endif
 	endif
 	if $language <> GUICtrlRead($langselect) then
 		$language = GUICtrlRead($langselect)
-		$newlang = true
-	else
-		$newlang = false
+		$redrawgui = true
 	endif
 
 	; format-specific preferences
@@ -2441,7 +2540,7 @@ func GUI_Prefs_OK()
 	GUIDelete($guiprefs)
 	if $prefsonly then 
 		$finishprefs = true
-	elseif $newlang then
+	elseif $redrawgui then
 		GUIDelete($guimain)
 		CreateGUI()
 	endif
@@ -2449,12 +2548,12 @@ endfunc
 
 ; Set file to extract and target directory, then exit
 func GUI_Ok()
-	$file = GUICtrlRead($filecont)
+	$file = EnvParse(GUICtrlRead($filecont))
 	if fileexists($file) then
-		if GUICtrlRead($dircont) == "" then
+		if EnvParse(GUICtrlRead($dircont)) == "" then
 			$outdir = '/sub'
 		else
-			$outdir = GUICtrlRead($dircont)
+			$outdir = EnvParse(GUICtrlRead($dircont))
 		endif
 		GUIDelete($guimain)
 		$finishgui = true
@@ -2464,7 +2563,7 @@ func GUI_Ok()
 		else
 			$file &= ' ' & t('DOES_NOT_EXIST')
 		endif
-		msgbox(48, $title, t('INVALID_FILE_SELECTED', _ArrayCreate($file)))
+		msgbox(48, $title, t('INVALID_FILE_SELECTED', CreateArray($file)))
 		return
 	endif
 endfunc

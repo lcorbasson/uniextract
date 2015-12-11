@@ -1,7 +1,7 @@
 [Setup]
 AppName=Universal Extractor
-AppVerName=Universal Extractor 1.6
-AppVersion=1.6
+AppVerName=Universal Extractor 1.6.1
+AppVersion=1.6.1
 AppPublisher=Jared Breland
 AppPublisherURL=http://www.legroom.net/mysoft
 AppSupportURL=http://www.legroom.net/mysoft
@@ -10,11 +10,11 @@ DefaultDirName={pf}\Universal Extractor
 DefaultGroupName=Universal Extractor
 DisableDirPage=false
 DisableProgramGroupPage=false
-OutputBaseFilename=uniextract16
-OutputDir=Y:\software\uniextract\uniextract_16
-SourceDir=Y:\software\uniextract\uniextract_16
-Compression=lzma/max
-InternalCompressLevel=max
+OutputBaseFilename=uniextract161
+OutputDir=.\
+SourceDir=.\
+Compression=lzma2/ultra
+InternalCompressLevel=ultra
 SolidCompression=true
 ;Compression=none
 ;InternalCompressLevel=none
@@ -24,7 +24,7 @@ DisableReadyPage=false
 ShowLanguageDialog=auto
 ;ShowLanguageDialog=yes
 LanguageDetectionMethod=uilanguage
-VersionInfoVersion=1.6
+VersionInfoVersion=1.6.1
 VersionInfoCompany=Jared Breland
 VersionInfoCopyright=GNU General Public License v2
 VersionInfoDescription=Package for Universal Extractor
@@ -33,9 +33,9 @@ ChangesAssociations=yes
 AllowUNCPath=false
 AllowNoIcons=true
 UninstallDisplayIcon={app}\UniExtract.exe
-WizardSmallImageFile=Y:\software\uniextract\support\Icons\uniextract_inno.bmp
+WizardSmallImageFile=..\support\Icons\uniextract_inno.bmp
 PrivilegesRequired=admin
-MinVersion=0,4.0
+MinVersion=0,5.0
 
 [Languages]
 ; Native
@@ -827,7 +827,7 @@ begin
 
 				// Add all UniExtract languages to combo box
 				for i := 0 to MaxLang do
-					ComboBox.Items.Add(languages[i][0])
+					ComboBox.Items.Add(languages[i][0]);
 
 				// Check for matching installer language
 				for i := 0 to MaxLang do begin
@@ -990,3 +990,4 @@ begin
 	Result := Dir;
 end;
 #include "..\..\modpath\modpath.iss"
+

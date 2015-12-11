@@ -1,6 +1,6 @@
 ; ----------------------------------------------------------------------------
 ;
-; Universal Extractor v1.1
+; Universal Extractor v1.2
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
 ; Language:	AutoIt v3.1.1.119-beta
@@ -13,9 +13,11 @@
 ; ----------------------------------------------------------------------------
 
 ; Setup environment
-;#notrayicon
+#notrayicon
 #include <GUIConstants.au3>
 #include <File.au3>
+$title = "Universal Extractor 1.2"
+$peidtitle = "PEiD v0.93"
 opt("GUIOnEventMode", 1)
 ;opt("WinTitleMatchMode", 4)
 $7z = "7z.exe"
@@ -38,6 +40,7 @@ $isexe = "IsXunpack.exe"
 $iso = "7z.exe"
 $lzh = "7z.exe"
 $lzo = "lzop.exe"
+$nsis = "7z.exe"
 $peid = "peid.exe"
 $rar = "unrar.exe"
 $rpm = "7z.exe"
@@ -47,8 +50,6 @@ $wise_wun = "wun.exe"
 $Z = "7z.exe"
 $zip = "unzip.exe"
 $output = " 2>&1 | tee.exe c:\uniextract.txt"
-$title = "Universal Extractor 1.1"
-$peidtitle = "PEiD v0.93"
 $height = @desktopheight/3
 dim $file, $filetype, $outdir, $prompt
 dim $exsig, $loadplugins, $stayontop
@@ -265,6 +266,9 @@ elseif $fileext = "exe" then
 
 	; Determine known filetypes
 	select
+		case stringinstr($filetype, "Nullsoft PiMP SFX", 0)
+			extract("nsis", "NSIS package");
+
 		case stringinstr($filetype, "Borland Delphi", 0)
 			runwait(@comspec & ' /c ' & $inno & ' "' & $file & '"' & $output, $filedir, @SW_HIDE)
 			if stringinstr(filereadline("c:\uniextract.txt", 1), "Version detected:", 0) then
@@ -303,6 +307,9 @@ elseif $fileext = "exe" then
 
 		case stringinstr($filetype, "SPx Method", 0) 
 			extract("cab", "Self-Extracting Microsoft CAB archive");
+
+		case stringinstr($filetype, "CAB SFX", 0) 
+			extract("cab2", "Self-Extracting Microsoft CAB archive");
 
 		case stringinstr($filetype, "Wise Installer", 0) OR stringinstr($filetype, "PEncrypt 4.0", 0)
 			extract("wise", "Wise Installer package");
@@ -412,35 +419,6 @@ func extract($arctype, $arcdisp)
 		case $arctype == "arj"
 			runwait(@comspec & ' /c ' & $arj & ' x "' & $file & '"' & $output, $outdir)
 
-		case $arctype == "bz2"
-			runwait(@comspec & ' /c ' & $bz2 & ' x "' & $file & '"' & $output, $outdir)
-			if stringtrimleft($filename, stringinstr($filename, '.', 0, -1)) = "tar" then
-				runwait(@comspec & ' /c ' & $tar & ' x "' & $outdir & '\' & $filename  & '"' & $output, $outdir)
-				filedelete($outdir & '\' & $filename)
-			endif
-
-		case $arctype == "cab"
-			runwait(@comspec & ' /c ' & $cab & ' x "' & $file & '"' & $output, $outdir)
-
-		case $arctype == "chm"
-			runwait(@comspec & ' /c ' & $chm & ' x "' & $file & '"' & $output, $outdir)
-			filedelete($outdir & '\#*')
-			filedelete($outdir & '\$*')
-			$dirs = filefindfirstfile($outdir & '\*')
-			if $dirs <> -1 then
-				$dir = filefindnextfile($dirs)
-				do
-					if stringleft($dir, 1) == '#' OR stringleft($dir, 1) == '$' then
-						dirremove($outdir & '\' & $dir,  1)
-					endif
-					$dir = filefindnextfile($dirs)
-				until @error
-			endif
-			fileclose($dirs)
-
-		case $arctype == "cpio"
-			runwait(@comspec & ' /c ' & $cpio & ' x "' & $file & '"' & $output, $outdir)
-
 		case $arctype == "bin"
 			$convert =  msgbox(65, $title, "BIN/CUE CD-ROM images cannot be extracted directly.  Instead, this image" & @CRLF & "will be converted to an ISO CD-ROM image, which will then be extracted." & @CRLF & @CRLF & "Would you like to continue?" & @CRLF & "Note: This process will take several minutes.")
 			if $convert <> 1 then
@@ -478,6 +456,38 @@ func extract($arctype, $arcdisp)
 					filedelete($filedir & '\' & $isofilename)
 				endif
 			endif
+
+		case $arctype == "bz2"
+			runwait(@comspec & ' /c ' & $bz2 & ' x "' & $file & '"' & $output, $outdir)
+			if stringtrimleft($filename, stringinstr($filename, '.', 0, -1)) = "tar" then
+				runwait(@comspec & ' /c ' & $tar & ' x "' & $outdir & '\' & $filename  & '"' & $output, $outdir)
+				filedelete($outdir & '\' & $filename)
+			endif
+
+		case $arctype == "cab"
+			runwait(@comspec & ' /c ' & $cab & ' x "' & $file & '"' & $output, $outdir)
+
+		case $arctype == "cab2"
+			runwait('"' & $file & '" /q /x:"' & $outdir & '"', $outdir)
+
+		case $arctype == "chm"
+			runwait(@comspec & ' /c ' & $chm & ' x "' & $file & '"' & $output, $outdir)
+			filedelete($outdir & '\#*')
+			filedelete($outdir & '\$*')
+			$dirs = filefindfirstfile($outdir & '\*')
+			if $dirs <> -1 then
+				$dir = filefindnextfile($dirs)
+				do
+					if stringleft($dir, 1) == '#' OR stringleft($dir, 1) == '$' then
+						dirremove($outdir & '\' & $dir,  1)
+					endif
+					$dir = filefindnextfile($dirs)
+				until @error
+			endif
+			fileclose($dirs)
+
+		case $arctype == "cpio"
+			runwait(@comspec & ' /c ' & $cpio & ' x "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "deb"
 			runwait(@comspec & ' /c ' & $deb & ' x "' & $file & '"' & $output, $outdir)
@@ -537,7 +547,7 @@ func extract($arctype, $arcdisp)
 					dirremove($outdir, 0)
 					exit
 				endif
-				runwait($file & ' /b"' & $outdir & '"', $filedir)
+				runwait('"' & $file & '" /b"' & $outdir & '"', $filedir)
 				filewriteline("c:\uniextract.txt", $arcdisp & " extractions cannot be logged.")
 			endif
 
@@ -552,6 +562,9 @@ func extract($arctype, $arcdisp)
 
 		case $arctype == "msi"
 			runwait('msiexec.exe /a "' & $file & '" /qb /log c:\uniextract.txt TARGETDIR="' & $outdir & '"', $filedir)
+
+		case $arctype == "nsis"
+			runwait(@comspec & ' /c ' & $nsis & ' x -y "' & $file & '"' & $output, $outdir)
 			
 		case $arctype == "rar"
 			runwait(@comspec & ' /c ' & $rar & ' x "' & $file & '"' & $output, $outdir)

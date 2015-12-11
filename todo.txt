@@ -1,3 +1,2 @@
-NSIS support
 Analyze binary files directly with AutoIt rather than using PEiD
 Incorporate output within AutoIt GUI rather than spawning external shell(s)

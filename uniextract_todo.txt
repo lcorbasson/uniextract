@@ -1,14 +1,44 @@
 Todo:
 
-validate default log location can be written to prior to first attempt
-investigate admin-only and drag-and-drop issues under Vista
-re-add Spanish support (need new translator)
-fix installer path issue under Windows 9x
-fix FileSearch() function under Windows 9x
-add Vietnamese translation for installer (does it exist?)
+Check feature request thread:
+http://www.msfn.org/board/index.php?showtopic=124535
+
+change from MHT Unpacker to http://www.totalcmd.net/plugring/MhtUnPack.html
+update notification - http://www.kcsoftwares.com/index.php?sumo - 858
+new MSI unpacker - http://www.jsware.net/jsware/msicode.php3 - 832
+new CD image converter - http://iat.berlios.de/ - 832
+address Chinese lang file rename (duplicates) - 702
+examine other language file - 700
+
 fix noun/adjective order support for translations
-fix _unpacked (lack of) translation
-add sendto option for installer
+add option to not display foreground extraction box?
+add support for Spoon Installer (http://sourceforge.net/projects/spoon-installer/)
+command line automation - 775
+fix hotfix support - 767
+add association options to UniExtract in addition to installer
+vmunpacker - packed file decompressor (http://unpacking.narod.ru/unpackers/universal/VMUnpacker1.2.rar)
+super - 703
+support .dmg with DMGExtractor. - 738
+Amiga formats - 718
+additional unpackers (plus check some older stuff) - 723
+additional unpackers - 735
+add support for Thinstall installers - 573
+new unpackers to test - 569
+support LiberalInstaller - 562 (probably not possible)
+add unshield.exe for InstallShield cabs - 558
+allow testing of multiple filetypes from TrID scan
+update translation instructions to specify Unicode
+update ExtractMHT?
+add cascaded context menu (what about cmenu?) - 447, 524
+fix missing ext extraction (eg, rar, msi, exe)? - 508
+add useful functionality to tray icon? - 503
+TrID defs update mechanism?
+support java 1.7 builds - 501
+add more exe unpackers? - 484
+support multiple file extraction - 502
+modify .msi to force asministrative installs? - 478
+Add option to copy rather than move temporary files - 439
+force "completed" message box to always be on top - 431
 add multiple aspack decompressors
 fix context-menu integration for limited users (HKCR issue) - comment 304
 separate associated file types for Windows Explorer sorting? - comment 116
@@ -19,54 +49,40 @@ add OLE extraction support? (need download link for olex_d)- comment 195
 add JPEG extraction support? - comment 195, 245
 figure out how to display and provide input for confirmation prompts
 powerpoint image extractor - comment 220
-windows 9x compatability issues - comment 285
+windows 9x compatability issues - comment 285, 516, 525
+fix installer path issue under Windows 9x
+fix FileSearch() function under Windows 9x
+new formats? - Dragon UnPACKer, Game Extractor, Quick Unpack - 405
+new formats? - MultiExtractor - 395
+aspack - Stripper - 364, RL!deASPack 2.x - 359
 
 Can't do:
 - can PhotoStory3.exe be supported - comment 169
 - support ASprotect files? (need samples) - comment 169
 - support skypesetup.exe - comment 154 - custom build of Inno Setup
 - multi-purpose file ripper - comment 220
+- support .wim files - 447
 
 Done:
-- check 7za.exe to see if current version supports all 7z.exe formats
-- typo - IstallShield package (also test message between bin/cue)
-- upgrade PEiD to 0.94
-- use innounp to extract embedded Inno Setup files - comment 114
-- PEiD - run deep scan, then hardcore scan, then external
-- decompress packed files - UPX, Aspack - comment 102
-- support Zip archives using Bzip2 compression - comment 151, 153, 177
-- add support for UHARC - comment 177
-- investigate KGB archiver support - comment 182 - added
-- fix support for "type-2" hotfixes - comment 166
-- add support for MHT-files - comment 170
-- add better MSI supprt - msi2xml
-- troubleshoot cdcbase275.exe - comment 172 - fixed, but possibly broke some hotfixes
-- add Wise for Windows Installer support (MSI extraction)
-- investigate including support files with InstallShield MSI extraction - comment 98 - added
-- optimization changes to avoid duplicate filetype checks
-- add support for zip files with .wz extension
-- lots of Wise and InstallShield tweaks
-- add support for InstallShield3 (*.z) - comment 170, 184, 195
-- additional inno setup support
-- 7-zip version - current beta version being used extracts .nsi - newer versions do not.  Preference?
-- fix mdt21_eng.exe - comment 265
-- fix 7-zip extraction - comment 260, 264 - temporary fix until overhaul in next version
-- add quicklaunch icon option
-- Windows 9x support?
-- extract Office beta installer - comment 261
-- add /d to comspec calls to disable AutoRun - comment 283
-- fix unknown extension bug in installer - eg, .img
-- link to Chinese port - comment 161
-- make history tracking optional
-- optional debug file location - comment 252
-- add option to open debug file directly - comment 293
-- add "Detect filetype" option?
-- add support for internationalization - comment 161
-- add support for LIT - comment 312
-- make AutoIt system tray icon visible? - comment 247
-- add support for pea format - http://sourceforge.net/projects/peazip
-- add InstallShield 5.x, 7.x decompilers - comment 195, 346
-- add support for uu/uue, b64/mme/mime, yenc/ync
-- update to use ShellExecute
-- support for old-NSIS (compressed in BZip2) - comment 170 - 7-zip doesn't support it (using InstallExplorer)
-- add support for Setup Factory installers? - comment 121 (using InstallExplorer)
+- make optional:  docs, languages, Ace (7-zip?), SIT, Pea, KGB
+- 	hide language selection if not enabled
+- move english.ini to root dir
+- fix relative paths?  "uniextract.exe package.exe"
+- validate default log location can be written to prior to first attempt
+- fix _unpacked (lack of) translation
+- add sendto option for installer
+- fix /sub output (and verify everything else)
+- add Vietnamese to changelog
+- add "not IS package" option for IS false positives
+- document return codes
+- add generic fead support
+- add support for lzma - 575
+- fix MS hotfix issue
+- change default debug location for Vista compatibility
+- create separate system/user preference files
+- how to deal with fead and is false positives?
+- add warning before executing file for extraction
+- fix command line issue
+- remove Win9x-specific code
+- CD-image utilities (http://es.geocities.com/dextstuff/cdirip/download.html) - 715
+- add full options page? - 519

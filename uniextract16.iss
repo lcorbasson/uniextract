@@ -1,7 +1,7 @@
 [Setup]
 AppName=Universal Extractor
-AppVerName=Universal Extractor 1.5
-AppVersion=1.5
+AppVerName=Universal Extractor 1.6
+AppVersion=1.6
 AppPublisher=Jared Breland
 AppPublisherURL=http://www.legroom.net/mysoft
 AppSupportURL=http://www.legroom.net/mysoft
@@ -9,10 +9,10 @@ AppUpdatesURL=http://www.legroom.net/mysoft
 DefaultDirName={pf}\Universal Extractor
 DefaultGroupName=Universal Extractor
 DisableDirPage=false
-DisableProgramGroupPage=true
-OutputBaseFilename=uniextract15
-OutputDir=Y:\software\uniextract\uniextract_15
-SourceDir=Y:\software\uniextract\uniextract_15
+DisableProgramGroupPage=false
+OutputBaseFilename=uniextract16
+OutputDir=Y:\software\uniextract\uniextract_16
+SourceDir=Y:\software\uniextract\uniextract_16
 Compression=lzma/max
 InternalCompressLevel=max
 SolidCompression=true
@@ -22,8 +22,9 @@ SolidCompression=true
 AlwaysShowComponentsList=false
 DisableReadyPage=false
 ShowLanguageDialog=auto
+;ShowLanguageDialog=yes
 LanguageDetectionMethod=uilanguage
-VersionInfoVersion=1.5
+VersionInfoVersion=1.6
 VersionInfoCompany=Jared Breland
 VersionInfoCopyright=GNU General Public License v2
 VersionInfoDescription=Package for Universal Extractor
@@ -33,41 +34,49 @@ AllowUNCPath=false
 AllowNoIcons=true
 UninstallDisplayIcon={app}\UniExtract.exe
 WizardSmallImageFile=Y:\software\uniextract\support\Icons\uniextract_inno.bmp
-PrivilegesRequired=poweruser
+PrivilegesRequired=admin
+MinVersion=0,4.0
 
 [Languages]
 ; Native
-;Name: ca; MessagesFile: compiler:Languages\Catalan.isl
-;Name: cs; MessagesFile: compiler:Languages\Czech.isl
-;Name: da; MessagesFile: compiler:Languages\Danish.isl
 Name: de; MessagesFile: compiler:Languages\German.isl
 Name: en; MessagesFile: compiler:Default.isl
-;Name: fi; MessagesFile: compiler:Languages\Finnish.isl
+Name: es; MessagesFile: compiler:Languages\Spanish.isl
+Name: nl; MessagesFile: compiler:Languages\Dutch.isl
 Name: fr; MessagesFile: compiler:Languages\French.isl
-;Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
+Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
 Name: it; MessagesFile: compiler:Languages\Italian.isl
 Name: pl; MessagesFile: compiler:Languages\Polish.isl
-;Name: pt; MessagesFile: compiler:Languages\Portuguese.isl
-;Name: pt_BR; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
+Name: pt; MessagesFile: compiler:Languages\Portuguese.isl
+Name: pt_BR; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: ru; MessagesFile: compiler:Languages\Russian.isl
 Name: sk; MessagesFile: compiler:Languages\Slovak.isl
 ; Third-Party
-;Name: be; MessagesFile: ..\support\IS_Languages\Belarus-5.1.0.isl
-;Name: el; MessagesFile: ..\support\IS_Languages\Greek-4-5.1.0.isl
-Name: es; MessagesFile: ..\support\IS_Languages\SpanishStd-2-5.1.0.isl
-;Name: et; MessagesFile: ..\support\IS_Languages\Estonian-2-5.1.0.isl
-;Name: gl; MessagesFile: ..\support\IS_Languages\Galician-2-5.1.0.isl
-;Name: id; MessagesFile: ..\support\IS_Languages\Indonesian-5.1.0.isl
-Name: ja; MessagesFile: ..\support\IS_Languages\Japanese-4-5.1.0.isl
-;Name: ro; MessagesFile: ..\support\IS_Languages\Romanian-5-5.1.0.isl
-;Name: sv; MessagesFile: ..\support\IS_Languages\Swedish-8-5.1.0.isl
+Name: ar; MessagesFile: ..\support\IS_Languages\Arabic-4-5.1.11.isl
+Name: bg; MessagesFile: ..\support\IS_Languages\Bulgarian-5.1.11.isl
+Name: ca; MessagesFile: ..\support\IS_Languages\Valencian-1-5.1.11.isl
+Name: hr; MessagesFile: ..\support\IS_Languages\Croatian-5-5.1.11.isl
+Name: ja; MessagesFile: ..\support\IS_Languages\Japanese-5-5.1.11.isl
+Name: ko; MessagesFile: ..\support\IS_Languages\Korean-5-5.1.11.isl
+Name: ro; MessagesFile: ..\support\IS_Languages\Romanian-6-5.1.11.isl
 Name: th; MessagesFile: ..\support\IS_Languages\Thai-4.0.4.isl
-;Name: tr; MessagesFile: ..\support\IS_Languages\Turkish-3-5.1.0.isl
+Name: tr; MessagesFile: ..\support\IS_Languages\Turkish-3-5.1.11.isl
 Name: zh_CN; MessagesFile: ..\support\IS_Languages\ChineseSimp-11-5.1.0.isl
 Name: zh_TW; MessagesFile: ..\support\IS_Languages\ChineseTrad-2-5.1.0.isl
 
 [CustomMessages]
 ;forcedesc=Force &association with all supported archive formats%nWarning: This may overwrite existing associations.
+
+[Types]
+Name: custom; Description: Select which optional components are installed; Flags: iscustom
+
+[Components]
+Name: docs; Description: {code:LangRead|COMP_DOCS}; Types: custom
+Name: lang; Description: {code:LangRead|COMP_LANG}; Types: custom
+Name: ace; Description: {code:LangRead|COMP_ACE}; Types: custom
+Name: kgb; Description: {code:LangRead|COMP_KGB}; Types: custom
+Name: pea; Description: {code:LangRead|COMP_PEA}; Types: custom
+Name: sit; Description: {code:LangRead|COMP_SIT}; Types: custom
 
 [Tasks]
 Name: associate; Description: {code:LangRead|ASSOCIATE}; Flags: checkablealone; Check: IsAdminLoggedOn() or IsPowerUserLoggedOn()
@@ -76,15 +85,25 @@ Name: associate\here; Description: {code:LangRead|ASSOCIATE_HERE}; Check: IsAdmi
 Name: associate\subdir; Description: {code:LangRead|ASSOCIATE_SUBDIR}; Check: IsAdminLoggedOn() or IsPowerUserLoggedOn()
 Name: associate\force; Description: {code:LangRead|ASSOCIATE_FORCE}; Flags: dontinheritcheck unchecked; Check: IsAdminLoggedOn() or IsPowerUserLoggedOn()
 Name: modifypath; Description: {code:LangRead|MODIFY_PATH}; Check: IsAdminLoggedOn() or IsPowerUserLoggedOn()
-Name: startmenuicon; Description: {code:LangRead|START_MENU_ICON}
+Name: sendtoicon; Description: {code:LangRead|SENDTO_ICON}; Flags: unchecked
 Name: desktopicon; Description: {code:LangRead|DESKTOP_ICON}; Flags: unchecked
 Name: quicklaunchicon; Description: {code:LangRead|QUICK_LAUNCH_ICON}; Flags: unchecked
 
 [Files]
 ;Source: UniExtract.au3; DestDir: {app}; Flags: ignoreversion
-Source: lang\*; DestDir: {app}\lang; Flags: ignoreversion
-Source: bin\*; DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: docs\*; DestDir: {app}\docs; Flags: ignoreversion
+Source: lang\*; DestDir: {app}\lang; Flags: ignoreversion; Components: lang
+Source: English.ini; DestDir: {app}; Flags: ignoreversion
+Source: docs\*; Excludes: xace*, kgb*, pea*, expander*; DestDir: {app}\docs; Flags: ignoreversion; Components: docs
+Source: bin\*; Excludes: xace*, kgb*, pea*, expander*, stuffit*; DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+Source: bin\xace.exe; DestDir: {app}\bin; Flags: ignoreversion; Components: ace
+Source: docs\xace*; DestDir: {app}\docs; Flags: ignoreversion; Components: ace and docs
+Source: bin\kgb_arch_decompress.exe; DestDir: {app}\bin; Flags: ignoreversion; Components: kgb
+Source: docs\kgb*; DestDir: {app}\docs; Flags: ignoreversion; Components: kgb and docs
+Source: bin\pea.exe; DestDir: {app}\bin; Flags: ignoreversion; Components: pea
+Source: docs\pea*; DestDir: {app}\docs; Flags: ignoreversion; Components: pea and docs
+Source: bin\Expander.exe; DestDir: {app}\bin; Flags: ignoreversion; Components: sit
+Source: bin\stuffit5.engine-5.1.dll; DestDir: {app}\bin; Flags: ignoreversion; Components: sit
+Source: docs\Expander*; DestDir: {app}\docs; Flags: ignoreversion; Components: sit and docs
 Source: ..\uniextract_changelog.txt; DestDir: {app}; DestName: changelog.txt; Flags: ignoreversion
 Source: ..\uniextract_license.txt; DestDir: {app}; DestName: license.txt; Flags: ignoreversion
 Source: ..\support\Icons\UniExtract_files.ico; DestDir: {app}; DestName: UniExtract.ico; Flags: ignoreversion
@@ -92,17 +111,22 @@ Source: UniExtract.exe; DestDir: {app}; Flags: ignoreversion
 Source: UniExtract.ini; DestDir: {app}; Flags: ignoreversion
 
 [Icons]
-Name: {commonprograms}\Universal Extractor; Filename: {app}\UniExtract.exe; WorkingDir: {app}; Tasks: startmenuicon
+Name: {group}\Universal Extractor; Filename: {app}\UniExtract.exe; WorkingDir: {app}
+Name: {group}\Universal Extractor Preferences; Filename: {app}\UniExtract.exe; Parameters: /prefs; WorkingDir: {app}
+Name: {group}\{cm:UninstallProgram,Universal Extractor}; Filename: {uninstallexe}
+Name: {sendto}\Universal Extractor; Filename: {app}\UniExtract.exe; WorkingDir: {app}; Tasks: sendtoicon
 Name: {userdesktop}\Universal Extractor; Filename: {app}\UniExtract.exe; WorkingDir: {app}; Tasks: desktopicon
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Universal Extractor; Filename: {app}\UniExtract.exe; WorkingDir: {app}; Tasks: quicklaunchicon
 
 [INI]
+Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: globalprefs; String: {code:GetPrefs|GlobalPrefsOpt}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: appendext; String: {code:GetPrefs|AppendExtOpt}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: history; String: {code:GetPrefs|HistoryOpt}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: removedupe; String: {code:GetPrefs|RemoveDupeOpt}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: removetemp; String: {code:GetPrefs|RemoveTempOpt}
+Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: warnexecute; String: {code:GetPrefs|WarnExecuteOpt}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: debugdir; String: {code:GetPrefs|DebugDir}
-Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: language; String: {code:GetPrefs|Language}
+Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: language; String: {code:GetPrefs|Language}; Components: lang
 
 [Registry]
 ; Paths
@@ -181,12 +205,12 @@ Root: HKCR; SubKey: expandfile\shell\uniextract_here\command; ValueType: string;
 Root: HKCR; SubKey: expandfile\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
 Root: HKCR; SubKey: expandfile\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
 
-Root: HKCR; SubKey: chm.file\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
-Root: HKCR; SubKey: chm.file\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
-Root: HKCR; SubKey: chm.file\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
-Root: HKCR; SubKey: chm.file\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
-Root: HKCR; SubKey: chm.file\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
-Root: HKCR; SubKey: chm.file\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
+Root: HKCR; SubKey: chm.file\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; OnlyBelowVersion: 0,6; Tasks: associate and associate\files
+Root: HKCR; SubKey: chm.file\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; OnlyBelowVersion: 0,6; Tasks: associate and associate\files
+Root: HKCR; SubKey: chm.file\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; OnlyBelowVersion: 0,6; Tasks: associate and associate\here
+Root: HKCR; SubKey: chm.file\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; OnlyBelowVersion: 0,6; Tasks: associate and associate\here
+Root: HKCR; SubKey: chm.file\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; OnlyBelowVersion: 0,6; Tasks: associate and associate\subdir
+Root: HKCR; SubKey: chm.file\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; OnlyBelowVersion: 0,6; Tasks: associate and associate\subdir
 
 Root: HKCR; SubKey: hlpfile\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
 Root: HKCR; SubKey: hlpfile\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
@@ -446,6 +470,15 @@ Root: HKCR; SubKey: {reg:HKCR\.mht,}\shell\uniextract_sub\command; ValueType: st
 Root: HKCR; Subkey: .mht; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.mht')
 Root: HKCR; Subkey: .mht; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
+Root: HKCR; SubKey: {reg:HKCR\.msu,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.msu')
+Root: HKCR; SubKey: {reg:HKCR\.msu,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.msu')
+Root: HKCR; SubKey: {reg:HKCR\.msu,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.msu')
+Root: HKCR; SubKey: {reg:HKCR\.msu,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.msu')
+Root: HKCR; SubKey: {reg:HKCR\.msu,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.msu')
+Root: HKCR; SubKey: {reg:HKCR\.msu,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.msu')
+Root: HKCR; Subkey: .msu; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.msu')
+Root: HKCR; Subkey: .msu; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+
 Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.pea')
 Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.pea')
 Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.pea')
@@ -565,7 +598,7 @@ Root: HKCR; Subkey: .zip; ValueType: string; ValueName: ; ValueData: UniExtract;
 
 [Code]
 const
-	MaxLang = 12-1;
+	MaxLang = 23;
 
 type
 	LangArr = array[0..MaxLang] of array[0..1] of String;
@@ -576,15 +609,18 @@ var
 	Header2: TNewStaticText;
 	ComboLabel: TNewStaticText;
 	ComboBox: TComboBox;
+	GlobalPrefsCheckBox: TCheckBox;
 	AppendExtCheckBox: TCheckBox;
 	HistoryCheckBox: TCheckBox;
 	RemoveDupeCheckBox: TCheckBox;
 	RemoveTempCheckBox: TCheckBox;
+	WarnExecuteCheckBox: TCheckBox;
 	DebugEditLabel: TNewStaticText;
 	DebugEditBox: TEdit;
 	DebugEditButton: TButton;
 	DebugDir: String;
 	ComboBoxSet: Boolean;
+	PrefsPageCreated: Boolean;
 
 function RVE(ext: String): Boolean;
 var
@@ -599,6 +635,7 @@ begin
 	end;
 end;
 
+
 function SetupLanguages(): LangArr;
 var
 	languages: LangArr;
@@ -607,30 +644,52 @@ begin
 	// English must always be element 0
 	languages[0][0] := 'English';
 	languages[0][1] := 'en';
-	languages[1][0] := 'Chinese (Simp)';
-	languages[1][1] := 'zh_CN';
-	languages[2][0] := 'Chinese (Trad)';
-	languages[2][1] := 'zh_TW';
-	languages[3][0] := 'French';
-	languages[3][1] := 'fr';
-	languages[4][0] := 'German';
-	languages[4][1] := 'de';
-	languages[5][0] := 'Italian';
-	languages[5][1] := 'it';
-	languages[6][0] := 'Japanese';
-	languages[6][1] := 'ja';
-	languages[7][0] := 'Polish';
-	languages[7][1] := 'pl';
-	languages[8][0] := 'Russian';
-	languages[8][1] := 'ru';
-	languages[9][0] := 'Slovak';
-	languages[9][1] := 'sk';
-	//languages[10][0] := 'Spanish';
-	//languages[10][1] := 'es';
-	languages[10][0] := 'Thai';
-	languages[10][1] := 'th';
-	languages[11][0] := 'Vietnamese';
-	languages[11][1] := 'vi';
+	languages[1][0] := 'Arabic';
+	languages[1][1] := 'ar';
+	languages[2][0] := 'Bulgarian';
+	languages[2][1] := 'bg';
+	languages[3][0] := 'Chinese (Simplified)';
+	languages[3][1] := 'zh_CN';
+	languages[4][0] := 'Chinese (Traditional)';
+	languages[4][1] := 'zh_TW';
+	languages[5][0] := 'Croatian';
+	languages[5][1] := 'hr';
+	languages[6][0] := 'Dutch';
+	languages[6][1] := 'nl';
+	languages[7][0] := 'French';
+	languages[7][1] := 'fr';
+	languages[8][0] := 'German';
+	languages[8][1] := 'de';
+	languages[9][0] := 'Hungarian';
+	languages[9][1] := 'hu';
+	languages[10][0] := 'Italian';
+	languages[10][1] := 'it';
+	languages[11][0] := 'Japanese';
+	languages[11][1] := 'ja';
+	languages[12][0] := 'Korean';
+	languages[12][1] := 'ko';
+	languages[13][0] := 'Polish';
+	languages[13][1] := 'pl';
+	languages[14][0] := 'Portuguese';
+	languages[14][1] := 'pt';
+	languages[15][0] := 'Portuguese (Brazilian)';
+	languages[15][1] := 'pt_BR';
+	languages[16][0] := 'Romanian';
+	languages[16][1] := 'ro';
+	languages[17][0] := 'Russian';
+	languages[17][1] := 'ru';
+	languages[18][0] := 'Slovak';
+	languages[18][1] := 'sk';
+	languages[19][0] := 'Spanish';
+	languages[19][1] := 'es';
+	languages[20][0] := 'Taiwanese';
+	languages[20][1] := 'zh';
+	languages[21][0] := 'Thai';
+	languages[21][1] := 'th';
+	languages[22][0] := 'Turkish';
+	languages[22][1] := 'tr';
+	languages[23][0] := 'Valencian (Catalan)';
+	languages[23][1] := 'ca';
 	Result := languages;
 end;
 
@@ -653,6 +712,12 @@ begin
 		end;
 	end else if Item = 'DebugDir' then begin
 		Result := DebugEditBox.Text;
+	end else if Item = 'GlobalPrefsOpt' then begin
+		if GlobalPrefsCheckBox.Checked then begin
+			Result := '1';
+		end else if NOT GlobalPrefsCheckBox.Checked then begin
+			Result := '0';
+		end;
 	end else if Item = 'AppendExtOpt' then begin
 		if AppendExtCheckBox.Checked then begin
 			Result := '1';
@@ -675,6 +740,12 @@ begin
 		if RemoveTempCheckBox.Checked then begin
 			Result := '1';
 		end else if NOT RemoveTempCheckBox.Checked then begin
+			Result := '0';
+		end;
+	end else if Item = 'WarnExecuteOpt' then begin
+		if WarnExecuteCheckBox.Checked then begin
+			Result := '1';
+		end else if NOT WarnExecuteCheckBox.Checked then begin
 			Result := '0';
 		end;
 	end;
@@ -702,160 +773,163 @@ begin
 	DebugEditBox.Text := DebugDir;
 end;
 
-procedure InitializeWizard;
+function InitializeSetup: Boolean;
 var
 	languages: LangArr;
-	i, LangMatch: Integer;
+	i: Integer;
 
 begin
 	// Extract temporary language files
-	ExtractTemporaryFile('English.ini');
-	ExtractTemporaryFile('Chinese (Simp).ini');
-	ExtractTemporaryFile('Chinese (Trad).ini');
-	ExtractTemporaryFile('French.ini');
-	ExtractTemporaryFile('German.ini');
-	ExtractTemporaryFile('Italian.ini');
-	ExtractTemporaryFile('Japanese.ini');
-	ExtractTemporaryFile('Polish.ini');
-	ExtractTemporaryFile('Russian.ini');
-	ExtractTemporaryFile('Slovak.ini');
-	//ExtractTemporaryFile('Spanish.ini');
-	ExtractTemporaryFile('Thai.ini');
-	ExtractTemporaryFile('Vietnamese.ini');
-
-	// Build the preferences page
-	PrefsPage := CreateCustomPage(wpSelectProgramGroup,
-		LangRead('PREFS_CAPTION'),
-		LangRead('PREFS_DESCRIPTION'));
-
-	Header1 := TNewStaticText.Create(PrefsPage);
-	Header1.Caption := LangRead('PREFS_LABEL1');
-	Header1.AutoSize := True;
-	Header1.Parent := PrefsPage.Surface;
-
-	Header2 := TNewStaticText.Create(PrefsPage);
-	Header2.Top := Header1.Top + Header1.Height + ScaleY(1);
-	Header2.Caption := LangRead('PREFS_LABEL2');
-	Header2.AutoSize := True;
-	Header2.Parent := PrefsPage.Surface;
-
-	ComboLabel := TNewStaticText.Create(PrefsPage);
-	ComboLabel.Top := Header2.Top + Header2.Height + ScaleY(12);
-	ComboLabel.Caption := LangRead('LANGUAGE_LABEL');
-	ComboLabel.AutoSize := True;
-	ComboLabel.Parent := PrefsPage.Surface;
-
-	ComboBox := TComboBox.Create(PrefsPage);
-	ComboBox.Top := ComboLabel.Top + ComboLabel.Height;
-	ComboBox.Width := ScaleX(130);
-	ComboBox.Parent := PrefsPage.Surface;
-	ComboBox.Style := csDropDownList;
-
-	// Add all UniExtract languages to combo box
 	languages := SetupLanguages();
 	for i := 0 to MaxLang do
-		ComboBox.Items.Add(languages[i][0])
-
-	// Check for matching installer language
-	for i := 0 to MaxLang do begin
-		if languages[i][1] = ExpandConstant('{language}') then begin
-			ComboBox.ItemIndex := i;
-			LangMatch := 1;
-		end;
-	end;
-	ComboBoxSet := True;
-
-	// If installer language isn't available, set to English as default
-	if LangMatch <> 1 then
-		ComboBox.ItemIndex := 0;
-
-	DebugEditLabel := TNewStaticText.Create(PrefsPage);
-	DebugEditLabel.Top := ComboBox.Top + ComboBox.Height + ScaleY(12);
-	DebugEditLabel.Caption := LangRead('DEBUG_LABEL');
-	DebugEditLabel.AutoSize := True;
-	DebugEditLabel.Parent := PrefsPage.Surface;
-
-	DebugEditBox := TEdit.Create(PrefsPage);
-	DebugEditBox.Top := DebugEditLabel.Top + DebugEditLabel.Height;
-	DebugEditBox.Width := PrefsPage.SurfaceWidth - ScaleX(85);
-	DebugEditBox.Text := '';
-	DebugEditBox.Parent := PrefsPage.Surface;
-
-	DebugEditButton := TButton.Create(PrefsPage);
-	DebugEditButton.Top := DebugEditLabel.Top + DebugEditLabel.Height;
-	DebugEditButton.Left := PrefsPage.SurfaceWidth - ScaleX(75);
-	DebugEditButton.Width := ScaleX(75);
-	DebugEditButton.Caption := 'B&rowse...';
-	DebugEditButton.OnClick := @DebugEditButtonClick;
-	DebugEditButton.Parent := PrefsPage.Surface;
-
-	AppendExtCheckBox := TCheckBox.Create(PrefsPage);
-	AppendExtCheckBox.Top := DebugEditBox.Top + DebugEditBox.Height + ScaleY(12);
-	AppendExtCheckBox.Width := PrefsPage.SurfaceWidth;
-	AppendExtCheckBox.Caption := LangRead('APPEND_EXT_LABEL');
-	AppendExtCheckBox.Checked := True;
-	AppendExtCheckBox.Parent := PrefsPage.Surface;
-
-	HistoryCheckBox := TCheckBox.Create(PrefsPage);
-	HistoryCheckBox.Top := AppendExtCheckBox.Top + AppendExtCheckBox.Height + ScaleY(5);
-	HistoryCheckBox.Width := PrefsPage.SurfaceWidth;
-	HistoryCheckBox.Caption := LangRead('HISTORY_LABEL');
-	HistoryCheckBox.Checked := True;
-	HistoryCheckBox.Parent := PrefsPage.Surface;
-
-	RemoveDupeCheckBox := TCheckBox.Create(PrefsPage);
-	RemoveDupeCheckBox.Top := HistoryCheckBox.Top + HistoryCheckBox.Height + ScaleY(5);
-	RemoveDupeCheckBox.Width := PrefsPage.SurfaceWidth;
-	RemoveDupeCheckBox.Caption := LangRead('REMOVE_DUPE_LABEL');
-	RemoveDupeCheckBox.Checked := True;
-	RemoveDupeCheckBox.Parent := PrefsPage.Surface;
-
-	RemoveTempCheckBox := TCheckBox.Create(PrefsPage);
-	RemoveTempCheckBox.Top := RemoveDupeCheckBox.Top + RemoveDupeCheckBox.Height + ScaleY(5);
-	RemoveTempCheckBox.Width := PrefsPage.SurfaceWidth;
-	RemoveTempCheckBox.Caption := LangRead('REMOVE_TEMP_LABEL');
-	RemoveTempCheckBox.Checked := True;
-	RemoveTempCheckBox.Parent := PrefsPage.Surface;
+		ExtractTemporaryFile(languages[i][0] + '.ini');
+	Result := True;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
-	i: Integer;
+	languages: LangArr;
+	i, LangMatch: Integer;
 	regkey, inifile: String;
 
 begin
-	// Preset options if passed on command line - overrides INI settings
-	if CurPageId = wpWelcome then begin
-		if paramcount() > 0 then begin
-			for i:=1 to paramcount() do begin
-				if Lowercase(Copy(ParamStr(i), 1, 9)) = '/debugdir' then
-					DebugEditBox.Text := RemoveQuotes(Copy(ParamStr(i), 11, Length(ParamStr(i))));
-				if Lowercase(Copy(ParamStr(i), 1, 12)) = '/noappendext' then
-					AppendExtCheckBox.Checked := False;
-				if Lowercase(Copy(ParamStr(i), 1, 10)) = '/nohistory' then
-					HistoryCheckBox.Checked := False;
-				if Lowercase(Copy(ParamStr(i), 1, 13)) = '/noremovedupe' then
-					RemoveDupeCheckBox.Checked := False;
-				if Lowercase(Copy(ParamStr(i), 1, 13)) = '/noremovetemp' then
-					RemoveTempCheckBox.Checked := False;
-			end;
-		end;
-	end;
+	// Build the preferences page
+	if CurPageId = wpSelectProgramGroup then begin
+		if NOT PrefsPageCreated then begin;
+			PrefsPage := CreateCustomPage(wpSelectProgramGroup,
+				LangRead('PREFS_CAPTION'),
+				LangRead('PREFS_DESCRIPTION'));
+			languages := SetupLanguages();
 
-	// Preset options if already set in INI file
-	if CurPageId = wpSelectDir then begin
+			Header1 := TNewStaticText.Create(PrefsPage);
+			Header1.Caption := LangRead('PREFS_LABEL1');
+			Header1.AutoSize := True;
+			Header1.Parent := PrefsPage.Surface;
+
+			Header2 := TNewStaticText.Create(PrefsPage);
+			Header2.Top := Header1.Top + Header1.Height + ScaleY(1);
+			Header2.Caption := LangRead('PREFS_LABEL2');
+			Header2.AutoSize := True;
+			Header2.Parent := PrefsPage.Surface;
+
+			if isComponentSelected('lang') then begin
+				ComboLabel := TNewStaticText.Create(PrefsPage);
+				ComboLabel.Top := Header2.Top + Header2.Height + ScaleY(12);
+				ComboLabel.Caption := LangRead('LANGUAGE_LABEL');
+				ComboLabel.AutoSize := True;
+				ComboLabel.Parent := PrefsPage.Surface;
+
+				ComboBox := TComboBox.Create(PrefsPage);
+				ComboBox.Top := ComboLabel.Top + ComboLabel.Height;
+				ComboBox.Width := ScaleX(130);
+				ComboBox.Parent := PrefsPage.Surface;
+				ComboBox.Style := csDropDownList;
+
+				// Add all UniExtract languages to combo box
+				for i := 0 to MaxLang do
+					ComboBox.Items.Add(languages[i][0])
+
+				// Check for matching installer language
+				for i := 0 to MaxLang do begin
+					if languages[i][1] = ExpandConstant('{language}') then begin
+						ComboBox.ItemIndex := i;
+						LangMatch := 1;
+					end;
+				end;
+				ComboBoxSet := True;
+
+				// If installer language isn't available, set to English as default
+				if LangMatch <> 1 then
+					ComboBox.ItemIndex := 0;
+			end;
+
+			DebugEditLabel := TNewStaticText.Create(PrefsPage);
+			if IsComponentSelected('lang') then begin
+				DebugEditLabel.Top := ComboBox.Top + ComboBox.Height + ScaleY(12);
+			end else begin
+				DebugEditLabel.Top := Header2.Top + Header2.Height + ScaleY(12);
+			end;
+			DebugEditLabel.Caption := LangRead('DEBUG_LABEL');
+			DebugEditLabel.AutoSize := True;
+			DebugEditLabel.Parent := PrefsPage.Surface;
+
+			DebugEditBox := TEdit.Create(PrefsPage);
+			DebugEditBox.Top := DebugEditLabel.Top + DebugEditLabel.Height;
+			DebugEditBox.Width := PrefsPage.SurfaceWidth - ScaleX(85);
+			DebugEditBox.Text := '';
+			DebugEditBox.Parent := PrefsPage.Surface;
+
+			DebugEditButton := TButton.Create(PrefsPage);
+			DebugEditButton.Top := DebugEditLabel.Top + DebugEditLabel.Height;
+			DebugEditButton.Left := PrefsPage.SurfaceWidth - ScaleX(75);
+			DebugEditButton.Width := ScaleX(75);
+			DebugEditButton.Caption := 'B&rowse...';
+			DebugEditButton.OnClick := @DebugEditButtonClick;
+			DebugEditButton.Parent := PrefsPage.Surface;
+
+			GlobalPrefsCheckBox := TCheckBox.Create(PrefsPage);
+			GlobalPrefsCheckBox.Caption := '';
+			GlobalPrefsCheckBox.Checked := False;
+			GlobalPrefsCheckBox.Parent := PrefsPage.Surface;
+			GlobalPrefsCheckBox.Visible := False;
+
+			AppendExtCheckBox := TCheckBox.Create(PrefsPage);
+			AppendExtCheckBox.Top := DebugEditBox.Top + DebugEditBox.Height + ScaleY(12);
+			AppendExtCheckBox.Width := PrefsPage.SurfaceWidth;
+			AppendExtCheckBox.Caption := LangRead('APPEND_EXT_LABEL');
+			AppendExtCheckBox.Checked := False;
+			AppendExtCheckBox.Parent := PrefsPage.Surface;
+
+			HistoryCheckBox := TCheckBox.Create(PrefsPage);
+			HistoryCheckBox.Top := AppendExtCheckBox.Top + AppendExtCheckBox.Height + ScaleY(5);
+			HistoryCheckBox.Width := PrefsPage.SurfaceWidth;
+			HistoryCheckBox.Caption := LangRead('HISTORY_LABEL');
+			HistoryCheckBox.Checked := True;
+			HistoryCheckBox.Parent := PrefsPage.Surface;
+
+			RemoveDupeCheckBox := TCheckBox.Create(PrefsPage);
+			RemoveDupeCheckBox.Top := HistoryCheckBox.Top + HistoryCheckBox.Height + ScaleY(5);
+			RemoveDupeCheckBox.Width := PrefsPage.SurfaceWidth;
+			RemoveDupeCheckBox.Caption := LangRead('REMOVE_DUPE_LABEL');
+			RemoveDupeCheckBox.Checked := True;
+			RemoveDupeCheckBox.Parent := PrefsPage.Surface;
+
+			RemoveTempCheckBox := TCheckBox.Create(PrefsPage);
+			RemoveTempCheckBox.Top := RemoveDupeCheckBox.Top + RemoveDupeCheckBox.Height + ScaleY(5);
+			RemoveTempCheckBox.Width := PrefsPage.SurfaceWidth;
+			RemoveTempCheckBox.Caption := LangRead('REMOVE_TEMP_LABEL');
+			RemoveTempCheckBox.Checked := True;
+			RemoveTempCheckBox.Parent := PrefsPage.Surface;
+
+			WarnExecuteCheckBox := TCheckBox.Create(PrefsPage);
+			WarnExecuteCheckBox.Top := RemoveTempCheckBox.Top + RemoveTempCheckBox.Height + ScaleY(5);
+			WarnExecuteCheckBox.Width := PrefsPage.SurfaceWidth;
+			WarnExecuteCheckBox.Caption := LangRead('WARN_EXECUTE_LABEL');
+			WarnExecuteCheckBox.Checked := True;
+			WarnExecuteCheckBox.Parent := PrefsPage.Surface;
+
+			PrefsPageCreated := True;
+		end;
+
+		// Preset options if already set in INI file
 		inifile := ExpandConstant('{app}\UniExtract.ini');
 		if DebugEditBox.Text = '' then begin
 			if IniKeyExists('UniExtract Preferences', 'debugdir', inifile) then begin
-					DebugEditBox.Text := GetIniString('UniExtract Preferences', 'debugdir', ExpandConstant('{sd}\'), inifile);
+				DebugEditBox.Text := GetIniString('UniExtract Preferences', 'debugdir', ExpandConstant('{%temp}'), inifile);
 			end else begin
-				DebugEditBox.Text := ExpandConstant('{sd}\');
+				DebugEditBox.Text := ExpandConstant('{%temp}\');
 			end;
 		end;
-		if AppendExtCheckBox.Checked then
+		if not GlobalPrefsCheckBox.Checked then
+			if IniKeyExists('UniExtract Preferences', 'globalprefs', inifile) then
+				if GetIniString('UniExtract Preferences', 'globalprefs', '1', inifile) = '1' then
+					GlobalPrefsCheckBox.Checked := True;
+		if HistoryCheckBox.Checked then
+			if IniKeyExists('UniExtract Preferences', 'history', inifile) then
+		if not AppendExtCheckBox.Checked then
 			if IniKeyExists('UniExtract Preferences', 'appendext', inifile) then
-				if GetIniString('UniExtract Preferences', 'appendext', '1', inifile) = '0' then
-					AppendExtCheckBox.Checked := False;
+				if GetIniString('UniExtract Preferences', 'appendext', '1', inifile) = '1' then
+					AppendExtCheckBox.Checked := True;
 		if HistoryCheckBox.Checked then
 			if IniKeyExists('UniExtract Preferences', 'history', inifile) then
 				if GetIniString('UniExtract Preferences', 'history', '1', inifile) = '0' then
@@ -868,24 +942,51 @@ begin
 			if IniKeyExists('UniExtract Preferences', 'removetemp', inifile) then
 				if GetIniString('UniExtract Preferences', 'removetemp', '1', inifile) = '0' then
 					RemoveTempCheckBox.Checked := False;
+		if WarnExecuteCheckBox.Checked then
+			if IniKeyExists('UniExtract Preferences', 'warnexecute', inifile) then
+				if GetIniString('UniExtract Preferences', 'warnexecute', '1', inifile) = '0' then
+					WarnExecuteCheckBox.Checked := False;
+
+		// Preset options if passed on command line - overrides INI settings
+		if paramcount() > 0 then begin
+			for i:=1 to paramcount() do begin
+				if Lowercase(Copy(ParamStr(i), 1, 9)) = '/debugdir' then
+					DebugEditBox.Text := RemoveQuotes(Copy(ParamStr(i), 11, Length(ParamStr(i))));
+				if Lowercase(Copy(ParamStr(i), 1, 12)) = '/appendext' then
+					AppendExtCheckBox.Checked := True;
+				if Lowercase(Copy(ParamStr(i), 1, 10)) = '/nohistory' then
+					HistoryCheckBox.Checked := False;
+				if Lowercase(Copy(ParamStr(i), 1, 13)) = '/noremovedupe' then
+					RemoveDupeCheckBox.Checked := False;
+				if Lowercase(Copy(ParamStr(i), 1, 13)) = '/noremovetemp' then
+					RemoveTempCheckBox.Checked := False;
+				if Lowercase(Copy(ParamStr(i), 1, 14)) = '/nowarnexecute' then
+					WarnExecuteCheckBox.Checked := False;
+			end;
+		end;
 	end;
 
 	// Validate debugdir, set to default options if necessary
-	if CurPageID = PrefsPage.ID then
+	if CurPageID = wpSelectTasks then
 		if DebugEditBox.Text = '' then
-			DebugEditBox.Text := ExpandConstant('{sd}\');
+			DebugEditBox.Text := ExpandConstant('{%temp}');
 
 	Result := True;
 end;
 
 const
-	ComponentList = '';
-	TaskList = 'associate - Enable Explorer context menu integration | associate\files - Add UniExtract Files... to context menu | associate\here - Add UniExtract Here to context menu | associate\subdir - Add UniExtract to Subdir to context menu | associate\force - Force association with all supported archive formats | modifypath - Add Universal Extractor to your system path | startmenuicon - Create a Start Menu icon | desktopicon - Create a desktop icon | quicklaunchicon - Create a Quick Launch icon';
-	ParameterList = '/DEBUGDIR="x:\dirname" - Sets the directory used for debug file output.  This defaults to the root of your system drive (usually "C:\") | /NOAPPENDEXT - Disables using TrID to identify and append file extensions to unknown files | /NOHISTORY - Disables archive and directory history functionality | /NOREMOVEDUPE - Duplicate files extracted by InstallExplorer will not be removed | /NOREMOVETEMP - Temporary files extracted by WUN will not be removed';
+	ComponentList = 'docs - Documentation and licensing information | lang - Language files for internationalization support | ace - Support for ACE files | kgb - Support for KGB files | pea - Support for Pea files | sit - Support for StuffIt files';
+	TaskList = 'associate - Enable Explorer context menu integration | associate\files - Add UniExtract Files... to context menu | associate\here - Add UniExtract Here to context menu | associate\subdir - Add UniExtract to Subdir to context menu | associate\force - Force association with all supported archive formats | modifypath - Add Universal Extractor to your system path | sendtoicon - Create a SendTo icon | desktopicon - Create a Desktop icon | quicklaunchicon - Create a Quick Launch icon';
+	ParameterList = '/DEBUGDIR="x:\dirname" - Sets the directory used for debug file output.  This defaults to the root of your system drive (usually "C:\") | /APPENDEXT - Enables using TrID to identify and append file extensions to unknown files | /NOHISTORY - Disables archive and directory history functionality | /NOREMOVEDUPE - Duplicate files extracted by InstallExplorer will not be removed | /NOREMOVETEMP - Temporary files extracted by WUN will not be removed | /NOWARNEXECUTE - Do not display warning prompt before executing files for extraction';
 #include "..\..\clihelp\clihelp.iss"
 
-function ModPathDir(): String;
+function ModPathDir(): TArrayOfString;
+var
+	Dir:	TArrayOfString;
 begin
-	Result := ExpandConstant('{app}') + '\bin';
+	setArrayLength(Dir, 2)
+	Dir[0] := ExpandConstant('{app}');
+	Dir[1] := ExpandConstant('{app}') + '\bin';
+	Result := Dir;
 end;
 #include "..\..\modpath\modpath.iss"

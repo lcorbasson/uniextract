@@ -1,3 +1,0 @@
-Path=.\Universal Extractor
-SavePath
-Title=Universal Extractor self-extracting archive

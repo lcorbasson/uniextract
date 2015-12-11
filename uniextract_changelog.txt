@@ -1,0 +1,80 @@
+1.3 (09/15/2006):
+
+  Added support for UHARC archives
+  Added support for KGB archives, including encrypted and self-extracting archives
+  Added support for MHTML (.mht) files
+  Added support for Wise for Windows Installer installers
+  Added support for InstallShield 3.x archives (.z, .1, and .lib)
+  Added support for decompressing UPX and ASpack files, including .dll files
+  Added additional support for MSI files
+  Added additional scanning options for PEiD
+  Added external database support for PEiD
+  Added ability to choose context menu items in installer
+  Added support for compressed files (.??_) to installer
+  Added command line usage information to installer (run with /?)
+  Added application-specific support for McAfee SuperDAT updater and CMenu installer
+  Fixed support for Microsoft hotfixes
+  Fixed miscellaneous typos
+  Fixed RPM file association in installer
+  Fixed miscellaneous file association bugs in installer
+  Updated PEiD to 0.94
+  Updated 7-zip to 4.42 (still using 4.40 nsis.dll)
+  Updated UnRAR to 3.60
+  Updated Inno Setup unpacking to include embedded files
+  Updated Inno Setup support to include newer versions
+  Updated InstallShield support to include support files when using cache option
+  Updated file scanning to speed up filetype detection
+  Updated Zip support to include files compressed with bzip2
+  Updated Zip support to include .wz extension
+  Updated Microsoft CAB support to include .imf extension
+  Updated Wise and InstallShield filetype detection to yield more accurate results
+
+
+1.2.1 (05/03/2006):
+
+  Fixed bug in Wise Installer support
+
+
+1.2 (05/02/2006):
+
+  Added preliminary support for NSIS installers
+  Added support for new-style MS SFX installers
+  Fixed potential bug in cache method of extracting for InstallShield installers
+  Updated 7-zip to 4.40 beta
+
+
+1.1 (04/20/2006):
+
+  Added support for ISO CD-ROM images, including boot image extraction
+  Added support for BIN/CUE CD-ROM images
+  Added support for IMG disk images
+  Added GUI file and directory history
+  Added GUI drag-and-drop support
+  Fixed i6comp bug for InstallShield CAB files
+  Updated installer to add UniExtract hooks to all formats, regardless of association
+  Updated GUI default directory selection behavior
+  Updated 7-zip to 4.39 beta
+  Updated AutoIt to 3.1.1.119 beta
+
+
+1.0 (01/16/2006):
+
+  Added GUI for file and directory selection
+  Added ability to specify destination directory
+  Added proper file association options to installer
+  Added multiple methods for extracting Wise Installer packages
+  Added multiple methods for extracting InstallShield Installer packages
+  Added syntax help (UniExtract.exe /help)
+  Added additional checks for supported, but unidentified, executables
+  Added better output validation
+  Added support for .001 RAR archives and .xpi ZIP archives
+  Fixed hang error when scanning .exe files
+  Fixed registry key causing long file name problems with context integration
+  Updated 7-Zip to 4.32
+  Updated HWUN to WUN 0.90a
+  Updated Is7unpack to IsXunpack 0.99
+
+
+0.8 (12/06/2005):
+
+  Initial release

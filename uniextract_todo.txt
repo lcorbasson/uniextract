@@ -1,0 +1,47 @@
+Todo:
+separate associated file types for Windows Explorer sorting? - comment 116
+add support for Setup Factory installers? (need samples) - comment 121
+get 4nt shell solution from clauderenaud - comment 154
+link to Chinese port - comment 161
+add internationalization support? - comment 161
+Incorporate output within AutoIt GUI rather than spawning external shell(s)
+troubleshoot comment 185
+add option to open destination folder after extraction - comment 193
+add OLE extraction support? (need download link for olex_d)- comment 195
+add JPEG extraction support? - comment 195
+add "Detect filetype" option?
+figure out how to display and provide input for confirmation prompts
+fix unknown extension bug in installer - eg, .img
+add InstallShield 5.x, 7.x decompilers - comment 195
+powerpoint image extractor - comment 220
+multi-purpose file ripper - comment 220
+support InstallShield apps identified as Visual C++ - comment 227
+
+Can't do:
+- can PhotoStory3.exe be supported - comment 169
+- support ASprotect files? (need samples) - comment 169
+- support skypesetup.exe - comment 154 - custom build of Inno Setup
+- support for old-NSIS (compressed in BZip2) - comment 170 - NSIS doesn't support it
+
+Done:
+- check 7za.exe to see if current version supports all 7z.exe formats
+- typo - IstallShield package (also test message between bin/cue)
+- upgrade PEiD to 0.94
+- use innounp to extract embedded Inno Setup files - comment 114
+- PEiD - run deep scan, then hardcore scan, then external
+- decompress packed files - UPX, Aspack - comment 102
+- support Zip archives using Bzip2 compression - comment 151, 153, 177
+- add support for UHARC - comment 177
+- investigate KGB archiver support - comment 182 - added
+- fix support for "type-2" hotfixes - comment 166
+- add support for MHT-files - comment 170
+- add better MSI supprt - msi2xml
+- troubleshoot cdcbase275.exe - comment 172 - fixed, but possibly broke some hotfixes
+- add Wise for Windows Installer support (MSI extraction)
+- investigate including support files with InstallShield MSI extraction - comment 98 - added
+- optimization changes to avoid duplicate filetype checks
+- add support for zip files with .wz extension
+- lots of Wise and InstallShield tweaks
+- add support for InstallShield3 (*.z) - comment 170, 184, 195
+- additional inno setup support
+- 7-zip version - current beta version being used extracts .nsi - newer versions do not.  Preference?

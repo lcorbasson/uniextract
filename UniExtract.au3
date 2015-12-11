@@ -1,10 +1,10 @@
 ; ----------------------------------------------------------------------------
 ;
-; Universal Extractor v1.2.1
+; Universal Extractor v1.3
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
-; Language:	AutoIt v3.1.1.119-beta
-; License:	GNU General Public License (http://www.gnu.org/copyleft/gpl.html)
+; Language:	AutoIt v3.2.0.1
+; License:	GNU General Public License v2 (http://www.gnu.org/copyleft/gpl.html)
 ;
 ; Script Function:
 ;	Extract known archive types
@@ -16,14 +16,17 @@
 #notrayicon
 #include <GUIConstants.au3>
 #include <File.au3>
-$title = "Universal Extractor 1.2.1"
-$peidtitle = "PEiD v0.93"
+$name = "Universal Extractor"
+$version = "1.3"
+$title = $name & " v" & $version
+$peidtitle = "PEiD v0.94"
+$msxml4 = "http://www.microsoft.com/downloads/details.aspx?familyid=3144b72b-b4f2-46da-b4b6-c5d7485f2b42&displaylang=en"
 opt("GUIOnEventMode", 1)
-;opt("WinTitleMatchMode", 4)
 $7z = "7z.exe"
 $ace = "xace.exe"
 $arc = "arc.exe"
 $arj = "arj.exe"
+$aspack = "AspackDie.exe"
 $bin = "bin2iso.exe"
 $bz2 = "7z.exe"
 $cab = "7z.exe"
@@ -33,26 +36,36 @@ $deb = "7z.exe"
 $expand = "expand.exe"
 $gz = "7z.exe"
 $hlp = "helpdeco.exe"
+$imf = "7z.exe"
 $img = "EXTRACT.EXE"
 $inno = "innounp.exe"
+$is3arc = "i3comp.exe"
 $iscab = "i6comp.exe"
 $isexe = "IsXunpack.exe"
 $iso = "7z.exe"
+$kgb = "kgb_arch_decompress.exe"
 $lzh = "7z.exe"
 $lzo = "lzop.exe"
+$mht = "extractMHT.exe"
+$msi_msi2xml = "msi2xml.exe"
 $nsis = "7z.exe"
 $peid = "peid.exe"
 $rar = "unrar.exe"
 $rpm = "7z.exe"
 $tar = "7z.exe"
+$uharc = "UNUHARC06.EXE"
+$uharc04 = "UHARC04.EXE"
+$uharc02 = "UHARC02.EXE"
+$upx = "upx.exe"
 $wise_ewise = "e_wise_w.exe"
 $wise_wun = "wun.exe"
 $Z = "7z.exe"
 $zip = "unzip.exe"
 $output = " 2>&1 | tee.exe c:\uniextract.txt"
 $height = @desktopheight/3
-dim $file, $filetype, $outdir, $prompt
+dim $file, $filetype, $outdir, $prompt, $packed, $return
 dim $exsig, $loadplugins, $stayontop
+dim $testinno, $testarj, $testace, $test7z, $testzip
 
 ; Set working path, include support for .au3 path to ease development
 if stringright(@scriptname, 3) = "au3" then
@@ -157,7 +170,10 @@ WriteHist('file', $file)
 WriteHist('directory', $outdir)
 
 ; Extract contents from known file extensions
-if $fileext = "7z" then
+if $fileext = "1" OR $fileext = "lib" then
+	extract("is3arc", "InstallShield 3.x archive")
+
+elseif $fileext = "7z" then
 	extract("7z", "7-Zip archive")
 
 elseif $fileext = "ace" then
@@ -169,7 +185,7 @@ elseif $fileext = "arc" then
 elseif $fileext = "arj" then
 	extract("arj", "ARJ archive")
 
-elseif $fileext = "bin" then
+elseif $fileext = "bin" OR $fileext = "cue" then
 	extract("bin", "BIN/CUE CD-ROM image")
 
 elseif $fileext = "bz2" then
@@ -190,11 +206,16 @@ elseif $fileext = "chm" then
 elseif $fileext = "cpio" then
 	extract("cpio", "CPIO archive")
 
-elseif $fileext = "cue" then
-	extract("bin", "BIN/CUE CD-ROM image")
-
 elseif $fileext = "deb" then
 	extract("deb", "Debian package")
+
+elseif $fileext = "dll" then
+	exescan('deep')
+	if $packed then
+		unpack()
+	else
+		terminate("unknownexe", $file, $filetype)
+	endif
 
 elseif stringright($fileext, 1) = "_" AND stringlen($fileext) = 3 then
 	extract("expand", "Microsoft Compressed file")
@@ -205,11 +226,17 @@ elseif $fileext = "gz" then
 elseif $fileext = "hlp" then
 	extract("hlp", "Windows Help file")
 
+elseif $fileext = "imf" then
+	extract("cab", "IncrediMail eCard")
+
 elseif $fileext = "img" then
 	extract("img", "Floppy disk image")
 
 elseif $fileext = "iso" then
 	extract("iso", "ISO CD-ROM image")
+
+elseif $fileext = "kgb" OR $fileext = "kge" then
+	extract("kgb", "KGB archive")
 
 elseif $fileext = "lzh" OR $fileext = "lha" then
 	extract("lzh", "LZH compressed file")
@@ -217,6 +244,9 @@ elseif $fileext = "lzh" OR $fileext = "lha" then
 elseif $fileext = "lzo" then
 	extract("lzo", "LZO compressed file")
 
+elseif $fileext = "mht" then
+	extract("mht", "MHTML web archive")
+	
 elseif $fileext = "msi" then
 	extract("msi", "Windows Installer (MSI) package")
 	
@@ -232,115 +262,35 @@ elseif $fileext = "tar" then
 elseif $fileext = "tbz2" OR $fileext = "tgz" OR $fileext = "tz" then
 	extract("tar", "Compressed Tar archive")
 
-elseif $fileext = "z" then
-	extract("Z", "LZW compressed file")
+elseif $fileext = "uha" then
+	extract("uha", "UHARC archive")
 
-elseif $fileext = "zip" OR $fileext = "jar" OR $fileext = "xpi" then
+elseif $fileext = "z" then
+	if NOT check7z() then extract("is3arc", "InstallShield 3.x archive")
+
+elseif $fileext = "zip" OR $fileext = "jar" OR $fileext = "xpi" OR $fileext = "wz" then
 	extract("zip", "ZIP archive")
 
 ; Determine type of .exe and extract if possible
 elseif $fileext = "exe" then
 
-	; Backup existing PEiD options
-	splashtexton($title, "Scanning file.", 275, 25, -1, $height, 16)
-	$exsig = regread("HKCU\Software\PEiD", "ExSig")
-	$loadplugins = regread("HKCU\Software\PEiD", "LoadPlugins")
-	$stayontop = regread("HKCU\Software\PEiD", "StayOnTop")
+	; Check for known exe filetypes
+	exescan('deep')
+	$tempftype = exescan('hard')
+	exescan('ext')
+	$filetype = $tempftype
 
-	; Set PEiD options
-	regwrite("HKCU\Software\PEiD", "ExSig", "REG_DWORD", 0)
-	regwrite("HKCU\Software\PEiD", "LoadPlugins", "REG_DWORD", 0)
-	regwrite("HKCU\Software\PEiD", "StayOnTop", "REG_DWORD", 0)
-
-	; Analyze file
-	run($peid & ' -hard "' & $file & '"', @scriptdir, @SW_HIDE)
-	;winwait("classname=#32770")
-	winwait($peidtitle)
-	while ($filetype = "") OR ($filetype = "Scanning...")
-		sleep (100)
-		$filetype = controlgettext($peidtitle, "", "Edit2")
-	wend
-	;winwait("classname=#32770")
-	winclose($peidtitle)
+	; Perform additional tests if necessary
+	splashtexton($title, "Testing unknown .exe file", 275, 25, -1, $height, 16)
+	if $testinno then checkInno()
+	if $testarj then checkArj()
+	if $testace then checkAce()
+	if $test7z then check7z()
+	if $testzip then checkZip()
 	splashoff()
 
-	; Determine known filetypes
-	select
-		case stringinstr($filetype, "Nullsoft PiMP SFX", 0)
-			extract("nsis", "NSIS package");
-
-		case stringinstr($filetype, "Borland Delphi", 0)
-			runwait(@comspec & ' /c ' & $inno & ' "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if stringinstr(filereadline("c:\uniextract.txt", 1), "Version detected:", 0) then
-				extract("inno", "Inno Setup package");
-			endif
-			runwait(@comspec & ' /c ' & $zip & ' -l "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if NOT stringinstr(filereadline("c:\uniextract.txt", 2), "signature not found", 0) then
-				extract("zip", "Self-Extracting Zip archive");
-			endif
-			filedelete("c:\uniextract.txt")
-
-		case stringinstr($filetype, "Inno Setup", 0)
-			extract("inno", "Inno Setup package");
-
-		case stringinstr($filetype, "InstallShield 2003", 0)
-			extract("isexe", "IstallShield package");
-
-		case stringinstr($filetype, "Microsoft Visual C++", 0) AND NOT stringinstr($filetype, "SPx Method", 0)
-			runwait(@comspec & ' /c ' & $7z & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if stringinstr(filereadline("c:\uniextract.txt", 4), "Listing archive:", 0) then
-				extract("7z", "7-Zip Installer package");
-			endif
-			filedelete("c:\uniextract.txt")
-
-		case stringinstr($filetype, "PEtite", 0)
-			runwait(@comspec & ' /c ' & $arj & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if stringinstr(filereadline("c:\uniextract.txt", 5), "Archive created:", 0) then
-				extract("arj", "Self-Extracting ARJ archive");
-			endif
-			; Might be an Ace file, but no way to test
-			extract("ace", "Self-Extracting ACE archive");
-			filedelete("c:\uniextract.txt")
-
-		case stringinstr($filetype, "RAR SFX", 0) 
-			extract("rar", "Self-Extracting RAR archive");
-
-		case stringinstr($filetype, "SPx Method", 0) 
-			extract("cab", "Self-Extracting Microsoft CAB archive");
-
-		case stringinstr($filetype, "CAB SFX", 0) 
-			extract("cab2", "Self-Extracting Microsoft CAB archive");
-
-		case stringinstr($filetype, "Wise Installer", 0) OR stringinstr($filetype, "PEncrypt 4.0", 0)
-			extract("wise", "Wise Installer package");
-
-		case stringinstr($filetype, "ZIP SFX", 0)
-			extract("zip", "Self-Extracting ZIP archive");
-
-		; Default case for non-PE executables - try 7zip and unzip
-		case stringinstr($filetype, "Not a valid PE file")
-			runwait(@comspec & ' /c ' & $7z & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if stringinstr(filereadline("c:\uniextract.txt", 4), "Listing archive:", 0) then
-				extract("7z", "Unknown 7-Zip archive");
-			endif
-			runwait(@comspec & ' /c ' & $zip & ' -l "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if stringinstr(filereadline("c:\uniextract.txt", 2), "Length", 0) then
-				extract("zip", "Unknown Zip archive");
-			endif
-			filedelete("c:\uniextract.txt")
-
-		; Default case for all other executables - try 7zip and unzip
-		case else
-			runwait(@comspec & ' /c ' & $7z & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if stringinstr(filereadline("c:\uniextract.txt", 4), "Listing archive:", 0) then
-				extract("7z", "Unknown 7-Zip archive");
-			endif
-			runwait(@comspec & ' /c ' & $zip & ' -l "' & $file & '"' & $output, $filedir, @SW_HIDE)
-			if stringinstr(filereadline("c:\uniextract.txt", 2), "Length", 0) then
-				extract("zip", "Unknown Zip archive");
-			endif
-			filedelete("c:\uniextract.txt")
-	endselect
+	; Unpack (vs. extract) packed file
+	if $packed then unpack()
 
 	; Exit with unknown file type
 	terminate("unknownexe", $file, $filetype)
@@ -361,12 +311,12 @@ func ReadHist($field)
 	elseif $field = 'directory' then
 		$reg = "HKCU\Software\UniExtract\History\Directory"
 	else
-		return;
+		return
 	endif
 	local $history
 	for $i = 0 to 9
 		$value = regread($reg, $i)
-		if $value <> "" then $history = $history & '|' & $value
+		if $value <> "" then $history &= '|' & $value
 	next
 	$history = stringtrimleft($history, 1)
 	return $history
@@ -379,7 +329,7 @@ func WriteHist($field, $new)
 	elseif $field = 'directory' then
 		$reg = "HKCU\Software\UniExtract\History\Directory"
 	else
-		return;
+		return
 	endif
 	$histarr = stringsplit(ReadHist($field), '|')
 	regwrite($reg, "0", "REG_SZ", $new)
@@ -392,6 +342,169 @@ func WriteHist($field, $new)
 		endif
 		regwrite($reg, string($i), "REG_SZ", $histarr[$i])
 	next
+endfunc
+
+; Scan .exe file using PEiD
+func exescan($scantype)
+	splashtexton($title, "Scanning file with " & $scantype & " scan.", 275, 25, -1, $height, 16)
+	; Backup existing PEiD options
+	$exsig = regread("HKCU\Software\PEiD", "ExSig")
+	$loadplugins = regread("HKCU\Software\PEiD", "LoadPlugins")
+	$stayontop = regread("HKCU\Software\PEiD", "StayOnTop")
+
+	; Set PEiD options
+	regwrite("HKCU\Software\PEiD", "ExSig", "REG_DWORD", 1)
+	regwrite("HKCU\Software\PEiD", "LoadPlugins", "REG_DWORD", 0)
+	regwrite("HKCU\Software\PEiD", "StayOnTop", "REG_DWORD", 0)
+
+	; Analyze file in deep scan mode
+	$filetype = ""
+	run($peid & ' -' & $scantype & ' "' & $file & '"', @scriptdir, @SW_HIDE)
+	;winwait("classname=#32770")
+	winwait($peidtitle)
+	while ($filetype = "") OR ($filetype = "Scanning...")
+		sleep (100)
+		$filetype = controlgettext($peidtitle, "", "Edit2")
+	wend
+	;winwait("classname=#32770")
+	winclose($peidtitle)
+	
+	; Restore previous PEiD options
+	if $exsig then regwrite("HKCU\Software\PEiD", "ExSig", "REG_DWORD", $exsig)
+	if $loadplugins then regwrite("HKCU\Software\PEiD", "LoadPlugins", "REG_DWORD", $loadplugins)
+	if $stayontop then regwrite("HKCU\Software\PEiD", "StayOnTop", "REG_DWORD", $stayontop)
+	splashoff()
+
+	; Match known patterns
+	select
+		case stringinstr($filetype, "Borland Delphi", 0) AND NOT stringinstr($filetype, "RAR SFX", 0)
+			$testinno = true
+			$testzip = true
+
+		case stringinstr($filetype, "Inno Setup", 0)
+			extract("inno", "Inno Setup package")
+
+		case stringinstr($filetype, "InstallShield", 0)
+			extract("isexe", "InstallShield package")
+
+		case stringinstr($filetype, "KGB SFX", 0) 
+			extract("kgb", "Self-Extracting KGB archive")
+
+		case stringinstr($filetype, "Microsoft Visual C++", 0) AND NOT stringinstr($filetype, "SPx Method", 0) AND NOT stringinstr($filetype, "Custom", 0)
+			$test7z = true
+
+		case stringinstr($filetype, "Microsoft Visual C++ 7.0", 0) AND stringinstr($filetype, "Custom", 0)
+			extract("vssfx", "Visual C++ Self-Extracting installer")
+
+		case stringinstr($filetype, "Nullsoft PiMP SFX", 0)
+			extract("nsis", "NSIS package")
+
+		case stringinstr($filetype, "PEtite", 0)
+			$testarj = true
+			$testace = true
+
+		case stringinstr($filetype, "RAR SFX", 0) 
+			extract("rar", "Self-Extracting RAR archive")
+
+		case stringinstr($filetype, "SPx Method", 0) OR stringinstr($filetype, "CAB SFX", 0)
+			extract("cab", "Self-Extracting Microsoft CAB archive")
+
+		case stringinstr($filetype, "SuperDAT", 0)
+			extract("superdat", "McAfee SuperDAT updater")
+
+		;case stringinstr($filetype, "CAB SFX", 0) 
+		;	extract("cab2", "Self-Extracting Microsoft CAB archive")
+
+		case stringinstr($filetype, "Wise", 0) OR stringinstr($filetype, "PEncrypt 4.0", 0)
+			extract("wise", "Wise Installer package")
+
+		case stringinstr($filetype, "ZIP SFX", 0)
+			extract("zip", "Self-Extracting ZIP archive")
+
+		case stringinstr($filetype, "upx", 0) OR stringinstr($filetype, "aspack", 0)
+			$packed = true
+
+		; Default case for non-PE executables - try 7zip and unzip
+		case else
+			$test7z = true
+			$testzip = true
+	endselect
+	return $filetype
+endfunc
+
+; Determine if 7-zip can extract the file
+func check7z()
+	splashtexton($title, "Testing 7-Zip Installer", 275, 25, -1, $height, 16)
+	runwait(@comspec & ' /c ' & $7z & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
+	if stringinstr(filereadline("c:\uniextract.txt", 4), "Listing archive:", 0) then
+		$infile = fileopen("c:\uniextract.txt", 0)
+		$line = filereadline($infile)
+		do
+			if stringinstr($line, "_sfx_manifest_") then
+				fileclose($infile)
+				filedelete("c:\uniextract.txt")
+				splashoff()
+				extract("hotfix", "Microsoft hotfix")
+			endif
+			$line = filereadline($infile)
+		until @error
+		fileclose($infile)
+		splashoff()
+		if $fileext = "exe" then
+			extract("7z", "7-Zip Installer package")
+		elseif $fileext = "z" then
+			extract("Z", "LZW compressed file")
+		endif
+	endif
+	filedelete("c:\uniextract.txt")
+	splashoff()
+	return false
+endfunc
+
+; Determine if file is Inno Setup installer
+func checkInno()
+	splashtexton($title, "Testing Inno Setup installer", 275, 25, -1, $height, 16)
+	runwait(@comspec & ' /c ' & $inno & ' "' & $file & '"' & $output, $filedir, @SW_HIDE)
+	if stringinstr(filereadline("c:\uniextract.txt", 1), "Version detected:", 0) _
+	 OR stringinstr(filereadline("c:\uniextract.txt", 1), "Signature detected:", 0) then
+		splashoff()
+		extract("inno", "Inno Setup package")
+	endif
+	filedelete("c:\uniextract.txt")
+	splashoff()
+	return false
+endfunc
+
+; Determine if file is self-extracting Zip archive
+func checkZip()
+	splashtexton($title, "Testing SFX Zip archive", 275, 25, -1, $height, 16)
+	runwait(@comspec & ' /c ' & $zip & ' -l "' & $file & '"' & $output, $filedir, @SW_HIDE)
+	if NOT stringinstr(filereadline("c:\uniextract.txt", 2), "signature not found", 0) then
+		splashoff()
+		extract("zip", "Self-Extracting Zip archive")
+	endif
+	filedelete("c:\uniextract.txt")
+	splashoff()
+	return false
+endfunc
+
+; Determine if file is self-extracting ARJ archive
+func checkArj()
+	splashtexton($title, "Testing SFX ARJ archive", 275, 25, -1, $height, 16)
+	runwait(@comspec & ' /c ' & $arj & ' l "' & $file & '"' & $output, $filedir, @SW_HIDE)
+	if stringinstr(filereadline("c:\uniextract.txt", 5), "Archive created:", 0) then
+		splashoff()
+		extract("arj", "Self-Extracting ARJ archive")
+	endif
+	filedelete("c:\uniextract.txt")
+	splashoff()
+	return false
+endfunc
+
+; Determine if file is self-extracting ACE archive
+func checkAce()
+	; No way to test, just try extracting
+	extract("ace", "Self-Extracting ACE archive")
 endfunc
 
 ; Extract from known archive format
@@ -465,10 +578,7 @@ func extract($arctype, $arcdisp)
 			endif
 
 		case $arctype == "cab"
-			runwait(@comspec & ' /c ' & $cab & ' x "' & $file & '"' & $output, $outdir)
-
-		case $arctype == "cab2"
-			runwait('"' & $file & '" /q /x:"' & $outdir & '"', $outdir)
+			runwait(@comspec & ' /c ' & $cab & ' x -aos "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "chm"
 			runwait(@comspec & ' /c ' & $chm & ' x "' & $file & '"' & $output, $outdir)
@@ -511,24 +621,41 @@ func extract($arctype, $arcdisp)
 				dirremove($outdir & '\Reconstructed', 1)
 			endif
 
+		case $arctype == "hotfix"
+			runwait('"' & $file & '" /q /x:"' & $outdir & '"', $outdir)
+
 		case $arctype == "img"
 			runwait(@comspec & ' /c ' & $img & ' -x "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "inno"
-			runwait(@comspec & ' /c ' & $inno & ' -x "' & $file & '"' & $output, $outdir)
+			runwait(@comspec & ' /c ' & $inno & ' -x -m "' & $file & '"' & $output, $outdir)
+
+		case $arctype == "is3arc"
+			runwait(@comspec & ' /c ' & $is3arc & ' "' & $file & '" *.* -d -i' & $output, $outdir)
 
 		case $arctype == "iscab"
-			runwait(@comspec & ' /c ' & $iscab & ' l -o "' & $file & '"' & $output, $outdir)
-			$infile = fileopen("c:\uniextract.txt", 0)
-			$line = filereadline($infile)
-			do
-				$isfile = stringtrimleft($line, stringinstr($line, ' ', 0, -1))
-				runwait(@comspec & ' /c ' & $iscab & ' e "' & $file & '" "' & $isfile & '"', $outdir, @SW_HIDE)
+			$choice = ISSelect()
+
+			; Extract with i6comp by referencing individual files
+			if $choice == "i6comp_files" then
+				runwait(@comspec & ' /c ' & $iscab & ' l -o -r -d "' & $file & '"' & $output, $outdir)
+				$infile = fileopen("c:\uniextract.txt", 0)
 				$line = filereadline($infile)
-			until @error
-			fileclose($infile)
+				do
+					$isfile = stringtrimleft($line, stringinstr($line, ' ', 0, -1))
+					runwait(@comspec & ' /c ' & $iscab & ' x -r -d "' & $file & '" "' & $isfile & '"', $outdir, @SW_HIDE)
+					$line = filereadline($infile)
+				until @error
+				fileclose($infile)
+
+			; Extract with i6comp in default group mode
+			elseif $choice == "i6comp_groups" then
+				runwait(@comspec & ' /c ' & $iscab & ' x -r -d "' & $file & '"', $outdir, @SW_HIDE)
+			endif
 
 		case $arctype == "isexe"
+			; Attempt to extract with isxcomp
+			$dirsize = dirgetsize($outdir)
 			filemove($file, $outdir)
 			run(@comspec & ' /c ' & $isexe & ' "' & $outdir & '\' & $filename & '.' & $fileext & '"' & $output, $outdir)
 			winwait(@comspec)
@@ -536,23 +663,56 @@ func extract($arctype, $arcdisp)
 			send("{ENTER}")
 			processwaitclose($isexe)
 			filemove($outdir & '\' & $filename & '.' & $fileext, $filedir)
-			if dirgetsize($outdir) == 0 then
-				$cache = msgbox(49, $title, "Initial extraction failed.  However, it may be possible to extract files" & @CRLF & "from this archive by instructing the installer to run in cache mode." & @CRLF & @CRLF & "Do you wish to try this method?")
+
+			; If failed, try to extract MSI using cache switch
+			if NOT (dirgetsize($outdir) > $dirsize) then
+				$cache = msgbox(65, $title, "Initial extraction failed.  However, it may be possible to extract files" & @CRLF & "from this archive by instructing the installer to run in cache mode." & @CRLF & @CRLF & "Do you wish to try this method?")
 				if $cache <> 1 then
 					dirremove($outdir, 0)
 					exit
 				endif
-				$cache = msgbox(65, $title, "When you click OK, the installer will be launched in cache mode." & @CRLF & "Please wait until it completely finishes initialization, then cancel the installer." & @CRLF & @CRLF & "Note:  It may take a few seconds for " & $title & " to complete extraction.")
-				if $cache <> 1 then
-					dirremove($outdir, 0)
-					exit
+
+				; Run installer and wait for temp files to be copied
+				opt("WinTitleMatchMode", 4)
+				splashtexton($title, "Waiting for installer to initialize." & @CRLF & "Please wait.", 250, 40, -1, $height, 16)
+				run('"' & $file & '" /b"' & $outdir & '"', $filedir)
+				winwait("classname=MsiDialogCloseClass")
+
+				; Search temp directory for MSI support and copy to outdir
+				$msiname = filefindnextfile(filefindfirstfile($outdir & "\*.msi"))
+				if NOT @error then
+					$tsearch = FileSearch(envget("temp") & "\" & $msiname)
+					if NOT @error then
+						$isdir = stringleft($tsearch[1], stringinstr($tsearch[1], '\', 0, -1)-1)
+						$handle = filefindfirstfile($isdir & "\*")
+						$fname = filefindnextfile($handle)
+						do
+							if $fname <> $msiname then _
+								filecopy($isdir & "\" & $fname, $outdir)
+							$fname = filefindnextfile($handle)
+						until @error
+						fileclose($handle)
+					endif
 				endif
-				runwait('"' & $file & '" /b"' & $outdir & '"', $filedir)
+
+				; Abort installer
+				splashoff()
+				msgbox(48, $title, "Initialization complete.  Please exit the installer, then click OK to continue.")
 				filewriteline("c:\uniextract.txt", $arcdisp & " extractions cannot be logged.")
 			endif
 
 		case $arctype == "iso"
 			runwait(@comspec & ' /c ' & $iso & ' x "' & $file & '"' & $output, $outdir)
+
+		case $arctype == "kgb"
+			$show_stats = regread("HKCU\Software\KGB Archiver", "show_stats")
+			regwrite("HKCU\Software\KGB Archiver", "show_stats", "REG_DWORD", 0)
+			runwait($kgb & ' /s "' & $file & '" "' & $outdir & '"', $outdir)
+			if $show_stats == "" then
+				regdelete("HKCU\Software\KGB Archiver")
+			else
+				regwrite("HKCU\Software\KGB Archiver", "show_stats", "REG_DWORD", $show_stats)
+			endif
 
 		case $arctype == "lzh"
 			runwait(@comspec & ' /c ' & $lzh & ' x "' & $file & '"' & $output, $outdir)
@@ -560,8 +720,20 @@ func extract($arctype, $arcdisp)
 		case $arctype == "lzo"
 			runwait(@comspec & ' /c ' & $lzo & ' -d -p"' & $outdir & '" "' & $file & '"' & $output, $filedir)
 
+		case $arctype == "mht"
+			runwait($mht & ' "' & $file & '" "' & $outdir & '"')
+
 		case $arctype == "msi"
-			runwait('msiexec.exe /a "' & $file & '" /qb /log c:\uniextract.txt TARGETDIR="' & $outdir & '"', $filedir)
+			$choice = MSISelect()
+
+			; Extract using administrative install
+			if $choice = "msi_admin" then
+				runwait('msiexec.exe /a "' & $file & '" /qb /log c:\uniextract.txt TARGETDIR="' & $outdir & '"', $filedir)
+			
+			; Extract with msi2xml
+			elseif $choice = $msi_msi2xml then
+				runwait(@comspec & ' /c ' & $msi_msi2xml & ' -b streams -c files "' & $file & '"' & $output, $outdir)
+			endif
 
 		case $arctype == "nsis"
 			runwait(@comspec & ' /c ' & $nsis & ' x -y "' & $file & '"' & $output, $outdir)
@@ -572,6 +744,10 @@ func extract($arctype, $arcdisp)
 		case $arctype == "rpm"
 			runwait(@comspec & ' /c ' & $rpm & ' x "' & $file & '"' & $output, $outdir)
 
+		case $arctype == "superdat"
+			runwait($file & ' /e "' & $outdir & '"', $outdir)
+			filedelete($filedir & '\SuperDAT.log')
+
 		case $arctype == "tar"
 			if $fileext = "tar" then
 				runwait(@comspec & ' /c ' & $tar & ' x "' & $file & '"' & $output, $outdir)
@@ -580,6 +756,11 @@ func extract($arctype, $arcdisp)
 				runwait(@comspec & ' /c ' & $tar & ' x "' & $outdir & '\' & $filename  & '.tar"' & $output, $outdir)
 				filedelete($outdir & '\' & $filename & '.tar')
 			endif
+
+		case $arctype == "vssfx"
+			filemove($file, $outdir)
+			runwait($outdir & '\' & $filename & ' /extract', $outdir)
+			filemove($outdir & '\' & $filename & '.' & $fileext, $filedir)
 
 		case $arctype == "wise"
 			$choice = WiseSelect()
@@ -611,8 +792,70 @@ func extract($arctype, $arcdisp)
 				filewriteline("c:\uniextract.txt", $arcdisp & " extractions cannot be logged.")
 
 			; Extract using the /x switch
-			else
+			elseif $choice = "wise_inst" then
 				runwait($file & ' /x ' & $outdir, $filedir)
+				filewriteline("c:\uniextract.txt", $arcdisp & " extractions cannot be logged.")
+
+			; Attempt to extract MSI
+			elseif $choice = "wise_msi" then
+
+				; Prompt to continue
+				$continue = msgbox(65, $title, "Note:  This method only works with specific Wise for Windows Installer packages." & @CRLF & "If the Wise Installation Wizard begins and simply waits for input, this file is not" & @CRLF & "supported.  Please exit the installer, and " & $name & " will abort extraction." & @CRLF & @CRLF & "Do you wish to continue?")
+				if $continue <> 1 then
+					dirremove($outdir, 0)
+					exit
+				endif
+
+				; First, check for any files that are already in extraction dir
+				$oldfiles = ""
+				if fileexists(@commonfilesdir & "\Wise Installation Wizard") then
+					$handle = filefindfirstfile(@commonfilesdir & "\Wise Installation Wizard\*")
+					if NOT @error then
+						while 1
+							$fname = filefindnextfile($handle)
+							if @error then exitloop
+							$oldfiles &= $fname & '|'
+						wend
+					endif
+					fileclose($handle)
+				endif
+
+				; Run installer
+				opt("WinTitleMatchMode", 3)
+				$pid = run($file & ' /?', $filedir)
+				while 1
+					sleep(1000)
+					if winexists("Windows Installer") then
+						winsetstate("Windows Installer", '', @SW_HIDE)
+						exitloop
+					else
+						if NOT processexists($pid) then exitloop
+					endif
+				wend
+
+				; Check for new files
+				$newfiles = ""
+				if fileexists(@commonfilesdir & "\Wise Installation Wizard") then
+					$handle = filefindfirstfile(@commonfilesdir & "\Wise Installation Wizard\*")
+					if NOT @error then
+						while 1
+							$fname = filefindnextfile($handle)
+							if @error then exitloop
+							if NOT stringinstr($oldfiles, $fname) then $newfiles &= $fname & "|"
+						wend
+					endif
+					fileclose($handle)
+				endif
+
+				; Move files to output directory
+				if $newfiles <> "" then
+					$newfiles = stringsplit($newfiles, '|')
+					for $i = 1 to $newfiles[0]-1
+						filemove(@commonfilesdir & "\Wise Installation Wizard\" & $newfiles[$i], $outdir)
+					next
+					dirremove(@commonfilesdir & "\Wise Installation Wizard", 0)
+				endif
+				winclose("Windows Installer")
 				filewriteline("c:\uniextract.txt", $arcdisp & " extractions cannot be logged.")
 			endif
 			
@@ -622,9 +865,26 @@ func extract($arctype, $arcdisp)
 				runwait(@comspec & ' /c ' & $tar & ' x "' & $outdir & '\' & $filename & '"' & $output, $outdir)
 				filedelete($outdir & '\' & $filename)
 			endif
-			
+
+		case $arctype == "uha"
+			runwait(@comspec & ' /c ' & $uharc & ' x -t"' & $outdir & '" "' & $file & '"' & $output, $outdir)
+			if dirgetsize($outdir) == 0 then
+				$error = filereadline("c:\uniextract.txt", 6)
+				if stringinstr($error, "use UHARC version", 0) then
+					$version = stringtrimleft($error, stringinstr($error, ' ', 0, -1))
+					if $version == '0.4' then
+						runwait(@comspec & ' /c ' & $uharc04 & ' x -t"' & $outdir & '" "' & $file & '"' & $output, $outdir)
+					elseif $version == '0.2' then
+						runwait(@comspec & ' /c ' & $uharc02 & ' x -t' & filegetshortname($outdir) & ' ' & filegetshortname($file) & $output, $outdir)
+					endif
+				endif
+			endif
+
 		case $arctype == "zip"
-			runwait(@comspec & ' /c ' & $zip & ' -x "' & $file & '"' & $output, $outdir)
+			$return = runwait(@comspec & ' /c ' & $zip & ' -x "' & $file & '"', $outdir)
+			if $return <> 0 then
+				runwait(@comspec & ' /c ' & $7z & ' x -aos "' & $file & '"' & $output, $outdir)
+			endif
 	endselect
 	
 	; Check for successful output
@@ -636,6 +896,61 @@ func extract($arctype, $arcdisp)
 	terminate("success", "", "")
 endfunc
 
+; Unpack packed executable
+func unpack()
+	local $packer
+	if stringinstr($filetype, "UPX", 0) OR $fileext = "dll" then
+		$packer = "UPX"
+	elseif stringinstr($filetype, "ASPack", 0) then
+		$packer = "ASPack"
+	endif
+
+	; prompt to continue
+	$unpack =  msgbox(65, $title, "This file is packed with " & $packer & " compression, but could be extracted." & @CRLF & "This could be because the filetype is unsupported, or because" & @CRLF & "there are simply no included files to extract." & @CRLF & @CRLF & "Would you like to unpack this file instead?" & @CRLF & @CRLF & "Note: The unpacked file will be named:" & @CRLF & $filedir & "\" & $filename & "_unpacked." & $fileext)
+	if $unpack <> 1 then return
+
+	; unpack file
+	if $packer == "UPX" then
+		runwait(@comspec & ' /c ' & $upx & ' -d -k "' & $file & '"', $filedir)
+		$tempext = stringtrimright($fileext, 1) & '~'
+		if fileexists($filedir & "\" & $filename & "." & $tempext) then
+			filemove($file, $filedir & "\" & $filename & "_unpacked." & $fileext)
+			filemove($filedir & "\" & $filename & "." & $tempext, $file)
+			terminate("success", "", "")
+		else
+			msgbox(48, $title, "Error: " & $file & @CRLF & "could not be unpacked.")
+			exit
+		endif
+	elseif $packer == "ASPack" then
+		runwait(@comspec & ' /c ' & $aspack & ' "' & $file & '" "' & $filedir & '\' & $filename & '_unpacked.exe" /NO_PROMPT', $filedir)
+		if fileexists($filedir & "\" & $filename & "_unpacked.exe") then
+			terminate("success", "", "")
+			msgbox(48, $title, "Error: " & $file & @CRLF & "could not be unpacked.")
+			exit
+		endif
+	endif
+	return
+endfunc
+
+; Recursively search for given pattern
+; code by w0uter (http://www.autoitscript.com/forum/index.php?showtopic=16421)
+func FileSearch($s_Mask = '', $i_Recurse = 1)
+	local $s_Buf = ''
+	if $i_Recurse then
+		local $s_Command = ' /c dir /B /S "'
+	else
+		local $s_Command = ' /c dir /B "'
+	endif
+	$i_Pid = Run(@ComSpec & $s_Command & $s_Mask & '"', @WorkingDir, @SW_HIDE, 2+4)
+	While Not @error
+		$s_Buf &= StdoutRead($i_Pid)
+	WEnd
+	$s_Buf = StringSplit(StringTrimRight($s_Buf, 2), @CRLF, 1)
+	ProcessClose($i_Pid)
+	If UBound($s_Buf) = 2 AND $s_Buf[1] = '' Then SetError(1)
+	Return $s_Buf
+endfunc
+
 ; Handle program termination with appropriate error message
 func terminate($status, $name, $id)
 	; Display error message if file could not be extracted
@@ -643,15 +958,15 @@ func terminate($status, $name, $id)
 		; Display usage information and exit
 		case $status == "syntax"
 			$syntax = "Extract files from any archive type or installer package."
-			$syntax = $syntax & @CRLF & "Usage:  " & @scriptname & " [/help] [filename [destination]]"
-			$syntax = $syntax & @CRLF & @CRLF & "Supported Arguments:"
-			$syntax = $syntax & @CRLF & "     /help" & @tab & @tab & "Display this help information"
-			$syntax = $syntax & @CRLF & "     filename" & @tab & "Name of file to extract"
-			$syntax = $syntax & @CRLF & "     destination" & @tab & "Directory to which to extract"
-			$syntax = $syntax & @CRLF & @CRLF & "Passing /sub instead of a destination directory name instructs" & @CRLF & $title & " to extract to subdirectory named after the archive."
-			$syntax = $syntax & @CRLF & @CRLF & "Example:"
-			$syntax = $syntax & @CRLF & "     " & @scriptname & " c:\1\example.zip c:\test"
-			$syntax = $syntax & @CRLF & @CRLF & "Running " & $title & " without any arguments will" & @CRLF & "prompt the user for the filename and destination directory."
+			$syntax &= @CRLF & "Usage:  " & @scriptname & " [/help] [filename [destination]]"
+			$syntax &= @CRLF & @CRLF & "Supported Arguments:"
+			$syntax &= @CRLF & "     /help" & @tab & @tab & "Display this help information"
+			$syntax &= @CRLF & "     filename" & @tab & "Name of file to extract"
+			$syntax &= @CRLF & "     destination" & @tab & "Directory to which to extract"
+			$syntax &= @CRLF & @CRLF & "Passing /sub instead of a destination directory name instructs" & @CRLF & $title & " to extract to subdirectory named after the archive."
+			$syntax &= @CRLF & @CRLF & "Example:"
+			$syntax &= @CRLF & "     " & @scriptname & " c:\1\example.zip c:\test"
+			$syntax &= @CRLF & @CRLF & "Running " & $title & " without any arguments will" & @CRLF & "prompt the user for the filename and destination directory."
 			msgbox(48, $title, $syntax)
 
 		; Display file not found error and exit
@@ -679,37 +994,140 @@ func terminate($status, $name, $id)
 			fileclose($outfile)
 			fileclose($infile)
 			filemove("c:\uniextract_temp.txt", "c:\uniextract.txt", 1)
-			msgbox(48, $title, $file & " could not be extracted." & @CRLF & "It appears to be a " & $id & ", which is supported, but extraction failed." & @CRLF & @CRLF & "Please see the log file, c:\uniextract.txt, for more information.")
+			msgbox(48, $title, $file & " could not be extracted." & @CRLF & "It appears to be a(n) " & $id & ", which is supported, but extraction failed." & @CRLF & @CRLF & "Please see the log file, c:\uniextract.txt, for more information.")
 
 		; Exit successfully
 		case $status == "success"
 			filedelete("c:\uniextract.txt")
 	endselect
-	
-	; Restore previous PEiD options
-	if $exsig then regwrite("HKCU\Software\PEiD", "ExSig", "REG_DWORD", $exsig)
-	if $loadplugins then regwrite("HKCU\Software\PEiD", "LoadPlugins", "REG_DWORD", $loadplugins)
-	if $stayontop then regwrite("HKCU\Software\PEiD", "StayOnTop", "REG_DWORD", $stayontop)
 	exit
+endfunc
+
+; Function to prompt user for choice of InstallShield cab extraction method
+func ISSelect()
+	; Create GUI
+	opt("GUIOnEventMode", 0)
+	GUICreate($title, 330, 160)
+	$header = GUICtrlCreateLabel("InstallShield Cab Extraction", 5, 5, 345, 20)
+	GUICtrlCreateLabel($name & " supports the following methods for extracting", 5, 25, -1, 20)
+	GUICtrlCreateLabel("InstallShield Cab files.  Unfortunately, none of these methods are", 5, 40, -1, 20)
+	GUICtrlCreateLabel("100% reliable.  If the default method does not seem to work, please", 5, 55, -1, 20)
+	GUICtrlCreateLabel("rerun " & $name & " and select an alternative method.", 5, 70, -1, 20)
+	GUICtrlCreateGroup("Extract Method", 5, 90, 150, 65)
+	$is1 = GUICtrlCreateRadio("i6comp by files", 10, 110, 140, 20)
+	$is2 = GUICtrlCreateRadio("i6comp by groups", 10, 130, 140, 20)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+	$ok = GUICtrlCreateButton("&OK", 200, 100, 80, 20)
+	$cancel = GUICtrlCreateButton("&Cancel", 200, 130, 80, 20)
+
+	; Set properties
+	GUICtrlSetFont($header, -1, 1200)
+	GUICtrlSetState($is1, $GUI_CHECKED)
+	GUICtrlSetState($ok, $GUI_DEFBUTTON)
+
+	; Display GUI and wait for action
+	GUISetState(@SW_SHOW)
+	while 1
+		$action = GUIGetMsg()
+		select
+			; Set extract command
+			case $action = $ok
+				if GUICtrlRead($is1) = $GUI_CHECKED then
+					GUIDelete()
+					return "i6comp_files"
+				elseif GUICtrlRead($is2) = $GUI_CHECKED then
+					GUIDelete()
+					return "i6comp_groups"
+				;elseif GUICtrlRead($wise3) = $GUI_CHECKED then
+				;	GUIDelete()
+				;	return "wise_inst"
+				endif
+
+			; Exit if Cancel clicked or window closed
+			case $action = $GUI_EVENT_CLOSE OR $action = $cancel
+				dirremove($outdir, 0)
+				exit
+		endselect
+	wend
+endfunc
+
+; Function to prompt user for choice of MSI extraction method
+func MSISelect()
+	; Create GUI
+	opt("GUIOnEventMode", 0)
+	GUICreate($title, 330, 180)
+	$header = GUICtrlCreateLabel("MSI Installer Extraction", 5, 5, 345, 20)
+	GUICtrlCreateLabel($name & " supports the following methods for extracting MSI", 5, 25, -1, 20)
+	GUICtrlCreateLabel("Installer packages.  Unfortunately, none of these methods are 100%", 5, 40, -1, 20)
+	GUICtrlCreateLabel("reliable.  If the default method does not seem to work, please rerun", 5, 55, -1, 20)
+	GUICtrlCreateLabel($name & " and select an alternative method.", 5, 70, -1, 20)
+	$note = GUICtrlCreateLabel("Note:", 5, 85, 32, 20)
+	GUICtrlCreateLabel("msi2xml requires the ", 38, 85, 95, 20)
+	$url = GUICtrlCreateLabel("MSXML 4.0 Parser", 136, 85, 90, 20)
+	GUICtrlCreateGroup("Extract Method", 5, 110, 150, 65)
+	$msi1 = GUICtrlCreateRadio("MSI Administrative Install", 10, 130, 140, 20)
+	$msi2 = GUICtrlCreateRadio("msi2xml extraction", 10, 150, 140, 20)
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+	$ok = GUICtrlCreateButton("&OK", 200, 120, 80, 20)
+	$cancel = GUICtrlCreateButton("&Cancel", 200, 150, 80, 20)
+
+	; Set properties
+	GUICtrlSetFont($note, 8.7, 800)
+	GUICtrlSetFont($url, 8.7, -1, 4)
+	GUICtrlSetColor($url, 0x0000ff)
+	GUICtrlSetCursor($url, 0)
+	GUICtrlSetFont($header, -1, 1200)
+	GUICtrlSetState($msi1, $GUI_CHECKED)
+	GUICtrlSetState($ok, $GUI_DEFBUTTON)
+
+	; Display GUI and wait for action
+	GUISetState(@SW_SHOW)
+	while 1
+		$action = GUIGetMsg()
+		select
+			; Set extract command
+			case $action = $ok
+				if GUICtrlRead($msi1) = $GUI_CHECKED then
+					GUIDelete()
+					return "msi_admin"
+				elseif GUICtrlRead($msi2) = $GUI_CHECKED then
+					GUIDelete()
+					return $msi_msi2xml
+				endif
+
+			case $action = $url
+				if @OSTYPE = "WIN32_NT" then
+					run(@ComSpec & ' /c start "UniExtract" ' & $msxml4, '', @SW_HIDE)
+				elseif @OSTYPE = "WIN32_WINDOWS" then
+					run(@ComSpec & ' /c start ' & $msxml4, '', @SW_HIDE)
+				endif
+
+			; Exit if Cancel clicked or window closed
+			case $action = $GUI_EVENT_CLOSE OR $action = $cancel
+				dirremove($outdir, 0)
+				exit
+		endselect
+	wend
 endfunc
 
 ; Function to prompt user for choice of Wise extraction method
 func WiseSelect()
 	; Create GUI
 	opt("GUIOnEventMode", 0)
-	GUICreate($title, 330, 180)
+	GUICreate($title, 330, 200)
 	$header = GUICtrlCreateLabel("Wise Installer Extraction", 5, 5, 345, 20)
-	GUICtrlCreateLabel($title & " supports the following methods for extracting Wise", 5, 25, -1, 20)
-	GUICtrlCreateLabel("Installer packages.  Unfortunately, none of these methods are 100%", 5, 40, -1, 20)
-	GUICtrlCreateLabel("reliable.  If the default method does not seem to work, please rerun", 5, 55, -1, 20)
-	GUICtrlCreateLabel($title & " and select an alternative method.", 5, 70, -1, 20)
-	GUICtrlCreateGroup("Extract Method", 5, 90, 150, 85)
+	GUICtrlCreateLabel($name & " supports the following methods for extracting", 5, 25, -1, 20)
+	GUICtrlCreateLabel("Wise Installer packages.  Unfortunately, none of these methods are", 5, 40, -1, 20)
+	GUICtrlCreateLabel("100% reliable.  If the default method does not seem to work, please", 5, 55, -1, 20)
+	GUICtrlCreateLabel("rerun " & $name & " and select an alternative method.", 5, 70, -1, 20)
+	GUICtrlCreateGroup("Extract Method", 5, 90, 150, 105)
 	$wise1 = GUICtrlCreateRadio("E_WISE Unpacker", 10, 110, 140, 20)
 	$wise2 = GUICtrlCreateRadio("WUN Unpacker", 10, 130, 140, 20)
 	$wise3 = GUICtrlCreateRadio("Wise Installer /x switch", 10, 150, 140, 20)
+	$wise4 = GUICtrlCreateRadio("Wise MSI extraction", 10, 170, 140, 20)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
-	$ok = GUICtrlCreateButton("&OK", 200, 110, 80, 20)
-	$cancel = GUICtrlCreateButton("&Cancel", 200, 140, 80, 20)
+	$ok = GUICtrlCreateButton("&OK", 200, 120, 80, 20)
+	$cancel = GUICtrlCreateButton("&Cancel", 200, 150, 80, 20)
 
 	; Set properties
 	GUICtrlSetFont($header, -1, 1200)
@@ -732,6 +1150,9 @@ func WiseSelect()
 				elseif GUICtrlRead($wise3) = $GUI_CHECKED then
 					GUIDelete()
 					return "wise_inst"
+				elseif GUICtrlRead($wise4) = $GUI_CHECKED then
+					GUIDelete()
+					return "wise_msi"
 				endif
 
 			; Exit if Cancel clicked or window closed
@@ -768,7 +1189,7 @@ func GUI_Directory()
 	elseif fileexists(GUICtrlRead($filecont)) then
 		$defdir = stringleft(GUICtrlRead($filecont), stringinstr(GUICtrlRead($filecont), '\', 0, -1)-1)
 	else
-		$defdir = '';
+		$defdir = ''
 	endif
 	$outdir = fileselectfolder("Extract to", "", 3, $defdir)
 	if not @error then
@@ -790,9 +1211,9 @@ func GUI_Ok()
 		$finishgui = 1
 	else
 		if $file == '' then
-			$file = '';
+			$file = ''
 		else
-			$file = $file & " does not exist." & @CRLF;
+			$file &= " does not exist." & @CRLF
 		endif
 		msgbox(48, $title, $file & "Please select valid file.")
 	endif

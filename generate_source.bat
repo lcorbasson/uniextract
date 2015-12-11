@@ -1,2 +1,2 @@
-del uniextract121_source.rar
-winrar.exe a -m5 -s uniextract121_source.rar ..\changelog.txt ..\todo.txt ..\license.txt ..\support\Icons compaile* generate* uniextract.* uniextract*.iss
+del uniextract13_source.rar
+winrar.exe a -m5 -s uniextract13_source.rar ..\uniextract_changelog.txt ..\uniextract_todo.txt ..\uniextract_license.txt ..\support\Icons compaile* generate* uniextract.* uniextract*.iss

@@ -1,18 +1,18 @@
 [Setup]
 AppName=Universal Extractor
-AppVerName=Universal Extractor 1.4.2
-AppVersion=1.4.2
+AppVerName=Universal Extractor 1.5
+AppVersion=1.5
 AppPublisher=Jared Breland
 AppPublisherURL=http://www.legroom.net/mysoft
 AppSupportURL=http://www.legroom.net/mysoft
 AppUpdatesURL=http://www.legroom.net/mysoft
 DefaultDirName={pf}\Universal Extractor
-DisableDirPage=false
 DefaultGroupName=Universal Extractor
+DisableDirPage=false
 DisableProgramGroupPage=true
-OutputDir=Y:\software\uniextract\uniextract_142
-SourceDir=Y:\software\uniextract\uniextract_142
-OutputBaseFilename=uniextract142
+OutputBaseFilename=uniextract15
+OutputDir=Y:\software\uniextract\uniextract_15
+SourceDir=Y:\software\uniextract\uniextract_15
 Compression=lzma/max
 InternalCompressLevel=max
 SolidCompression=true
@@ -23,7 +23,7 @@ AlwaysShowComponentsList=false
 DisableReadyPage=false
 ShowLanguageDialog=auto
 LanguageDetectionMethod=uilanguage
-VersionInfoVersion=1.4.2
+VersionInfoVersion=1.5
 VersionInfoCompany=Jared Breland
 VersionInfoCopyright=GNU General Public License v2
 VersionInfoDescription=Package for Universal Extractor
@@ -46,15 +46,15 @@ Name: en; MessagesFile: compiler:Default.isl
 Name: fr; MessagesFile: compiler:Languages\French.isl
 ;Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
 Name: it; MessagesFile: compiler:Languages\Italian.isl
-;Name: pl; MessagesFile: compiler:Languages\Polish.isl
+Name: pl; MessagesFile: compiler:Languages\Polish.isl
 ;Name: pt; MessagesFile: compiler:Languages\Portuguese.isl
 ;Name: pt_BR; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
-;Name: ru; MessagesFile: compiler:Languages\Russian.isl
-;Name: sk; MessagesFile: compiler:Languages\Slovak.isl
+Name: ru; MessagesFile: compiler:Languages\Russian.isl
+Name: sk; MessagesFile: compiler:Languages\Slovak.isl
 ; Third-Party
 ;Name: be; MessagesFile: ..\support\IS_Languages\Belarus-5.1.0.isl
 ;Name: el; MessagesFile: ..\support\IS_Languages\Greek-4-5.1.0.isl
-;Name: es; MessagesFile: ..\support\IS_Languages\SpanishStd-2-5.1.0.isl
+Name: es; MessagesFile: ..\support\IS_Languages\SpanishStd-2-5.1.0.isl
 ;Name: et; MessagesFile: ..\support\IS_Languages\Estonian-2-5.1.0.isl
 ;Name: gl; MessagesFile: ..\support\IS_Languages\Galician-2-5.1.0.isl
 ;Name: id; MessagesFile: ..\support\IS_Languages\Indonesian-5.1.0.isl
@@ -82,14 +82,14 @@ Name: quicklaunchicon; Description: {code:LangRead|QUICK_LAUNCH_ICON}; Flags: un
 
 [Files]
 ;Source: UniExtract.au3; DestDir: {app}; Flags: ignoreversion
+Source: lang\*; DestDir: {app}\lang; Flags: ignoreversion
+Source: bin\*; DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
+Source: docs\*; DestDir: {app}\docs; Flags: ignoreversion
 Source: ..\uniextract_changelog.txt; DestDir: {app}; DestName: changelog.txt; Flags: ignoreversion
 Source: ..\uniextract_license.txt; DestDir: {app}; DestName: license.txt; Flags: ignoreversion
 Source: ..\support\Icons\UniExtract_files.ico; DestDir: {app}; DestName: UniExtract.ico; Flags: ignoreversion
 Source: UniExtract.exe; DestDir: {app}; Flags: ignoreversion
 Source: UniExtract.ini; DestDir: {app}; Flags: ignoreversion
-Source: bin\*; DestDir: {app}\bin; Flags: ignoreversion recursesubdirs
-Source: docs\*; DestDir: {app}\docs; Flags: ignoreversion
-Source: lang\*; DestDir: {app}\lang; Flags: ignoreversion
 
 [Icons]
 Name: {commonprograms}\Universal Extractor; Filename: {app}\UniExtract.exe; WorkingDir: {app}; Tasks: startmenuicon
@@ -97,7 +97,10 @@ Name: {userdesktop}\Universal Extractor; Filename: {app}\UniExtract.exe; Working
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Universal Extractor; Filename: {app}\UniExtract.exe; WorkingDir: {app}; Tasks: quicklaunchicon
 
 [INI]
+Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: appendext; String: {code:GetPrefs|AppendExtOpt}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: history; String: {code:GetPrefs|HistoryOpt}
+Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: removedupe; String: {code:GetPrefs|RemoveDupeOpt}
+Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: removetemp; String: {code:GetPrefs|RemoveTempOpt}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: debugdir; String: {code:GetPrefs|DebugDir}
 Filename: {app}\UniExtract.ini; Section: UniExtract Preferences; Key: language; String: {code:GetPrefs|Language}
 
@@ -129,26 +132,26 @@ Root: HKCR; SubKey: .ex_\shell\uniextract_here\command; ValueType: string; Value
 Root: HKCR; SubKey: .ex_\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
 Root: HKCR; SubKey: .ex_\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
 
-Root: HKCR; SubKey: .in_\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
-Root: HKCR; SubKey: .in_\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
-Root: HKCR; SubKey: .in_\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
-Root: HKCR; SubKey: .in_\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
-Root: HKCR; SubKey: .in_\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
-Root: HKCR; SubKey: .in_\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
+;Root: HKCR; SubKey: .in_\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
+;Root: HKCR; SubKey: .in_\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
+;Root: HKCR; SubKey: .in_\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
+;Root: HKCR; SubKey: .in_\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
+;Root: HKCR; SubKey: .in_\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
+;Root: HKCR; SubKey: .in_\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
 
-Root: HKCR; SubKey: .oc_\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
-Root: HKCR; SubKey: .oc_\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
-Root: HKCR; SubKey: .oc_\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
-Root: HKCR; SubKey: .oc_\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
-Root: HKCR; SubKey: .oc_\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
-Root: HKCR; SubKey: .oc_\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
+;Root: HKCR; SubKey: .oc_\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
+;Root: HKCR; SubKey: .oc_\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
+;Root: HKCR; SubKey: .oc_\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
+;Root: HKCR; SubKey: .oc_\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
+;Root: HKCR; SubKey: .oc_\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
+;Root: HKCR; SubKey: .oc_\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
 
-Root: HKCR; SubKey: .sr_\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
-Root: HKCR; SubKey: .sr_\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
-Root: HKCR; SubKey: .sr_\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
-Root: HKCR; SubKey: .sr_\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
-Root: HKCR; SubKey: .sr_\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
-Root: HKCR; SubKey: .sr_\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
+;Root: HKCR; SubKey: .sr_\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
+;Root: HKCR; SubKey: .sr_\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
+;Root: HKCR; SubKey: .sr_\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
+;Root: HKCR; SubKey: .sr_\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
+;Root: HKCR; SubKey: .sr_\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
+;Root: HKCR; SubKey: .sr_\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
 
 Root: HKCR; SubKey: .sy_\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
 Root: HKCR; SubKey: .sy_\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
@@ -199,6 +202,15 @@ Root: HKCR; SubKey: Msi.Package\shell\uniextract_here\command; ValueType: string
 Root: HKCR; SubKey: Msi.Package\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
 Root: HKCR; SubKey: Msi.Package\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
 
+Root: HKCR; SubKey: Msi.Patch\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and associate\files
+Root: HKCR; SubKey: Msi.Patch\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and associate\files
+Root: HKCR; SubKey: Msi.Patch\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and associate\here
+Root: HKCR; SubKey: Msi.Patch\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and associate\here
+Root: HKCR; SubKey: Msi.Patch\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and associate\subdir
+Root: HKCR; SubKey: Msi.Patch\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and associate\subdir
+
+; Additional Associations
+
 ; Additional Associations
 Root: HKCR; SubKey: {reg:HKCR\.001,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.001')
 Root: HKCR; SubKey: {reg:HKCR\.001,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.001')
@@ -209,14 +221,14 @@ Root: HKCR; SubKey: {reg:HKCR\.001,}\shell\uniextract_sub\command; ValueType: st
 Root: HKCR; Subkey: .001; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.001')
 Root: HKCR; Subkey: .001; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
-Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.1')
-Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.1')
-Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.1')
-Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.1')
-Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.1')
-Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.1')
-Root: HKCR; Subkey: .1; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.1')
-Root: HKCR; Subkey: .1; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+;Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.1')
+;Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.1')
+;Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.1')
+;Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.1')
+;Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.1')
+;Root: HKCR; SubKey: {reg:HKCR\.1,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.1')
+;Root: HKCR; Subkey: .1; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.1')
+;Root: HKCR; Subkey: .1; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
 Root: HKCR; SubKey: {reg:HKCR\.7z,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.7z')
 Root: HKCR; SubKey: {reg:HKCR\.7z,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.7z')
@@ -254,14 +266,14 @@ Root: HKCR; SubKey: {reg:HKCR\.arj,}\shell\uniextract_sub\command; ValueType: st
 Root: HKCR; Subkey: .arj; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.arj')
 Root: HKCR; Subkey: .arj; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
-Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.bin')
-Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.bin')
-Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.bin')
-Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.bin')
-Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.bin')
-Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.bin')
-Root: HKCR; Subkey: .bin; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.bin')
-Root: HKCR; Subkey: .bin; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+;Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.bin')
+;Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.bin')
+;Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.bin')
+;Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.bin')
+;Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.bin')
+;Root: HKCR; SubKey: {reg:HKCR\.bin,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.bin')
+;Root: HKCR; Subkey: .bin; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.bin')
+;Root: HKCR; Subkey: .bin; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
 Root: HKCR; SubKey: {reg:HKCR\.bz2,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.bz2')
 Root: HKCR; SubKey: {reg:HKCR\.bz2,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.bz2')
@@ -308,6 +320,15 @@ Root: HKCR; SubKey: {reg:HKCR\.deb,}\shell\uniextract_sub\command; ValueType: st
 Root: HKCR; Subkey: .deb; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.deb')
 Root: HKCR; Subkey: .deb; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
+Root: HKCR; SubKey: {reg:HKCR\.dbx,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.dbx')
+Root: HKCR; SubKey: {reg:HKCR\.dbx,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.dbx')
+Root: HKCR; SubKey: {reg:HKCR\.dbx,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.dbx')
+Root: HKCR; SubKey: {reg:HKCR\.dbx,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.dbx')
+Root: HKCR; SubKey: {reg:HKCR\.dbx,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.dbx')
+Root: HKCR; SubKey: {reg:HKCR\.dbx,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.dbx')
+Root: HKCR; Subkey: .dbx; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.dbx')
+Root: HKCR; Subkey: .dbx; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+
 Root: HKCR; SubKey: {reg:HKCR\.gz,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.gz')
 Root: HKCR; SubKey: {reg:HKCR\.gz,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.gz')
 Root: HKCR; SubKey: {reg:HKCR\.gz,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.gz')
@@ -317,14 +338,14 @@ Root: HKCR; SubKey: {reg:HKCR\.gz,}\shell\uniextract_sub\command; ValueType: str
 Root: HKCR; Subkey: .gz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.gz')
 Root: HKCR; Subkey: .gz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
-Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.imf')
-Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.imf')
-Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.imf')
-Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.imf')
-Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.imf')
-Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.imf')
-Root: HKCR; Subkey: .imf; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.imf')
-Root: HKCR; Subkey: .imf; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+;Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.imf')
+;Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.imf')
+;Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.imf')
+;Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.imf')
+;Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.imf')
+;Root: HKCR; SubKey: {reg:HKCR\.imf,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.imf')
+;Root: HKCR; Subkey: .imf; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.imf')
+;Root: HKCR; Subkey: .imf; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
 Root: HKCR; SubKey: {reg:HKCR\.img,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.img')
 Root: HKCR; SubKey: {reg:HKCR\.img,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.img')
@@ -380,14 +401,14 @@ Root: HKCR; SubKey: {reg:HKCR\.lha,}\shell\uniextract_sub\command; ValueType: st
 Root: HKCR; Subkey: .lha; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.lha')
 Root: HKCR; Subkey: .lha; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
-Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.lib')
-Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.lib')
-Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.lib')
-Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.lib')
-Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.lib')
-Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.lib')
-Root: HKCR; Subkey: .lib; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.lib')
-Root: HKCR; Subkey: .lib; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+;Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.lib')
+;Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.lib')
+;Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.lib')
+;Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.lib')
+;Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.lib')
+;Root: HKCR; SubKey: {reg:HKCR\.lib,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.lib')
+;Root: HKCR; Subkey: .lib; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.lib')
+;Root: HKCR; Subkey: .lib; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
 Root: HKCR; SubKey: {reg:HKCR\.lit,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.lit')
 Root: HKCR; SubKey: {reg:HKCR\.lit,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.lit')
@@ -425,6 +446,15 @@ Root: HKCR; SubKey: {reg:HKCR\.mht,}\shell\uniextract_sub\command; ValueType: st
 Root: HKCR; Subkey: .mht; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.mht')
 Root: HKCR; Subkey: .mht; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
+Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.pea')
+Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.pea')
+Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.pea')
+Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.pea')
+Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.pea')
+Root: HKCR; SubKey: {reg:HKCR\.pea,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.pea')
+Root: HKCR; Subkey: .pea; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.pea')
+Root: HKCR; Subkey: .pea; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+
 Root: HKCR; SubKey: {reg:HKCR\.rar,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.rar')
 Root: HKCR; SubKey: {reg:HKCR\.rar,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.rar')
 Root: HKCR; SubKey: {reg:HKCR\.rar,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.rar')
@@ -442,6 +472,15 @@ Root: HKCR; SubKey: {reg:HKCR\.rpm,}\shell\uniextract_sub; ValueType: string; Va
 Root: HKCR; SubKey: {reg:HKCR\.rpm,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.rpm')
 Root: HKCR; Subkey: .rpm; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.rpm')
 Root: HKCR; Subkey: .rpm; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+
+Root: HKCR; SubKey: {reg:HKCR\.sit,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.sit')
+Root: HKCR; SubKey: {reg:HKCR\.sit,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.sit')
+Root: HKCR; SubKey: {reg:HKCR\.sit,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.sit')
+Root: HKCR; SubKey: {reg:HKCR\.sit,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.sit')
+Root: HKCR; SubKey: {reg:HKCR\.sit,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.sit')
+Root: HKCR; SubKey: {reg:HKCR\.sit,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.sit')
+Root: HKCR; Subkey: .sit; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.sit')
+Root: HKCR; Subkey: .sit; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
 Root: HKCR; SubKey: {reg:HKCR\.tar,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.tar')
 Root: HKCR; SubKey: {reg:HKCR\.tar,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.tar')
@@ -488,14 +527,14 @@ Root: HKCR; SubKey: {reg:HKCR\.uha,}\shell\uniextract_sub\command; ValueType: st
 Root: HKCR; Subkey: .uha; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.uha')
 Root: HKCR; Subkey: .uha; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
-Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.wz')
-Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.wz')
-Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.wz')
-Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.wz')
-Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.wz')
-Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.wz')
-Root: HKCR; Subkey: .wz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.wz')
-Root: HKCR; Subkey: .wz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
+;Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.wz')
+;Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.wz')
+;Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_here; ValueType: string; ValueData: {code:LangRead|EXTRACT_HERE}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\here; Check: RVE('.wz')
+;Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_here\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" ."; Tasks: associate and not associate\force and associate\here; Check: RVE('.wz')
+;Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_sub; ValueType: string; ValueData: {code:LangRead|EXTRACT_SUB}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.wz')
+;Root: HKCR; SubKey: {reg:HKCR\.wz,}\shell\uniextract_sub\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"" /sub"; Tasks: associate and not associate\force and associate\subdir; Check: RVE('.wz')
+;Root: HKCR; Subkey: .wz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate and not associate\force; Check: not RVE('.wz')
+;Root: HKCR; Subkey: .wz; ValueType: string; ValueName: ; ValueData: UniExtract; Flags: uninsdeletekeyifempty; Tasks: associate\force
 
 Root: HKCR; SubKey: {reg:HKCR\.xpi,}\shell\uniextract; ValueType: string; ValueData: {code:LangRead|EXTRACT_FILES}; Flags: uninsdeletekey; Tasks: associate and not associate\force and associate\files; Check: RVE('.xpi')
 Root: HKCR; SubKey: {reg:HKCR\.xpi,}\shell\uniextract\command; ValueType: string; ValueData: """{app}\uniextract.exe"" ""%1"""; Tasks: associate and not associate\force and associate\files; Check: RVE('.xpi')
@@ -526,20 +565,24 @@ Root: HKCR; Subkey: .zip; ValueType: string; ValueName: ; ValueData: UniExtract;
 
 [Code]
 const
-	MaxLang = 8-1;
+	MaxLang = 12-1;
 
 type
 	LangArr = array[0..MaxLang] of array[0..1] of String;
 
 var
 	PrefsPage: TWizardPage;
-	Header: TNewStaticText;
+	Header1: TNewStaticText;
+	Header2: TNewStaticText;
 	ComboLabel: TNewStaticText;
 	ComboBox: TComboBox;
-	CheckBox: TCheckBox;
-	EditLabel: TNewStaticText;
-	EditBox: TEdit;
-	EditButton: TButton;
+	AppendExtCheckBox: TCheckBox;
+	HistoryCheckBox: TCheckBox;
+	RemoveDupeCheckBox: TCheckBox;
+	RemoveTempCheckBox: TCheckBox;
+	DebugEditLabel: TNewStaticText;
+	DebugEditBox: TEdit;
+	DebugEditButton: TButton;
 	DebugDir: String;
 	ComboBoxSet: Boolean;
 
@@ -568,16 +611,26 @@ begin
 	languages[1][1] := 'zh_CN';
 	languages[2][0] := 'Chinese (Trad)';
 	languages[2][1] := 'zh_TW';
-	languages[3][0] := 'Deutsch';
-	languages[3][1] := 'de';
-	languages[4][0] := 'Francais';
-	languages[4][1] := 'fr';
-	languages[5][0] := 'Italiano';
+	languages[3][0] := 'French';
+	languages[3][1] := 'fr';
+	languages[4][0] := 'German';
+	languages[4][1] := 'de';
+	languages[5][0] := 'Italian';
 	languages[5][1] := 'it';
 	languages[6][0] := 'Japanese';
 	languages[6][1] := 'ja';
-	languages[7][0] := 'Thai';
-	languages[7][1] := 'th';
+	languages[7][0] := 'Polish';
+	languages[7][1] := 'pl';
+	languages[8][0] := 'Russian';
+	languages[8][1] := 'ru';
+	languages[9][0] := 'Slovak';
+	languages[9][1] := 'sk';
+	//languages[10][0] := 'Spanish';
+	//languages[10][1] := 'es';
+	languages[10][0] := 'Thai';
+	languages[10][1] := 'th';
+	languages[11][0] := 'Vietnamese';
+	languages[11][1] := 'vi';
 	Result := languages;
 end;
 
@@ -599,11 +652,29 @@ begin
 					Result := languages[i][0];
 		end;
 	end else if Item = 'DebugDir' then begin
-		Result := EditBox.Text;
-	end else if Item = 'HistoryOpt' then begin
-		if CheckBox.Checked then begin
+		Result := DebugEditBox.Text;
+	end else if Item = 'AppendExtOpt' then begin
+		if AppendExtCheckBox.Checked then begin
 			Result := '1';
-		end else if NOT CheckBox.Checked then begin
+		end else if NOT AppendExtCheckBox.Checked then begin
+			Result := '0';
+		end;
+	end else if Item = 'HistoryOpt' then begin
+		if HistoryCheckBox.Checked then begin
+			Result := '1';
+		end else if NOT HistoryCheckBox.Checked then begin
+			Result := '0';
+		end;
+	end else if Item = 'RemoveDupeOpt' then begin
+		if RemoveDupeCheckBox.Checked then begin
+			Result := '1';
+		end else if NOT RemoveDupeCheckBox.Checked then begin
+			Result := '0';
+		end;
+	end else if Item = 'RemoveTempOpt' then begin
+		if RemoveTempCheckBox.Checked then begin
+			Result := '1';
+		end else if NOT RemoveTempCheckBox.Checked then begin
 			Result := '0';
 		end;
 	end;
@@ -624,11 +695,11 @@ begin
 	end;
 end;
 
-procedure EditButtonClick(Sender: TObject);
+procedure DebugEditButtonClick(Sender: TObject);
 begin
-	DebugDir := EditBox.Text;
+	DebugDir := DebugEditBox.Text;
 	BrowseforFolder('Debug File Location', DebugDir, True);
-	EditBox.Text := DebugDir;
+	DebugEditBox.Text := DebugDir;
 end;
 
 procedure InitializeWizard;
@@ -638,27 +709,38 @@ var
 
 begin
 	// Extract temporary language files
+	ExtractTemporaryFile('English.ini');
 	ExtractTemporaryFile('Chinese (Simp).ini');
 	ExtractTemporaryFile('Chinese (Trad).ini');
-	ExtractTemporaryFile('Deutsch.ini');
-	ExtractTemporaryFile('English.ini');
-	ExtractTemporaryFile('Francais.ini');
-	ExtractTemporaryFile('Italiano.ini');
+	ExtractTemporaryFile('French.ini');
+	ExtractTemporaryFile('German.ini');
+	ExtractTemporaryFile('Italian.ini');
 	ExtractTemporaryFile('Japanese.ini');
+	ExtractTemporaryFile('Polish.ini');
+	ExtractTemporaryFile('Russian.ini');
+	ExtractTemporaryFile('Slovak.ini');
+	//ExtractTemporaryFile('Spanish.ini');
 	ExtractTemporaryFile('Thai.ini');
+	ExtractTemporaryFile('Vietnamese.ini');
 
 	// Build the preferences page
 	PrefsPage := CreateCustomPage(wpSelectProgramGroup,
 		LangRead('PREFS_CAPTION'),
 		LangRead('PREFS_DESCRIPTION'));
 
-	Header := TNewStaticText.Create(PrefsPage);
-	Header.Caption := LangRead('PREFS_LABEL');
-	Header.AutoSize := True;
-	Header.Parent := PrefsPage.Surface;
+	Header1 := TNewStaticText.Create(PrefsPage);
+	Header1.Caption := LangRead('PREFS_LABEL1');
+	Header1.AutoSize := True;
+	Header1.Parent := PrefsPage.Surface;
+
+	Header2 := TNewStaticText.Create(PrefsPage);
+	Header2.Top := Header1.Top + Header1.Height + ScaleY(1);
+	Header2.Caption := LangRead('PREFS_LABEL2');
+	Header2.AutoSize := True;
+	Header2.Parent := PrefsPage.Surface;
 
 	ComboLabel := TNewStaticText.Create(PrefsPage);
-	ComboLabel.Top := Header.Top + Header.Height + ScaleY(16);
+	ComboLabel.Top := Header2.Top + Header2.Height + ScaleY(12);
 	ComboLabel.Caption := LangRead('LANGUAGE_LABEL');
 	ComboLabel.AutoSize := True;
 	ComboLabel.Parent := PrefsPage.Surface;
@@ -687,32 +769,53 @@ begin
 	if LangMatch <> 1 then
 		ComboBox.ItemIndex := 0;
 
-	EditLabel := TNewStaticText.Create(PrefsPage);
-	EditLabel.Top := ComboBox.Top + ComboBox.Height + ScaleY(13);
-	EditLabel.Caption := LangRead('DEBUG_LABEL');
-	EditLabel.AutoSize := True;
-	EditLabel.Parent := PrefsPage.Surface;
+	DebugEditLabel := TNewStaticText.Create(PrefsPage);
+	DebugEditLabel.Top := ComboBox.Top + ComboBox.Height + ScaleY(12);
+	DebugEditLabel.Caption := LangRead('DEBUG_LABEL');
+	DebugEditLabel.AutoSize := True;
+	DebugEditLabel.Parent := PrefsPage.Surface;
 
-	EditBox := TEdit.Create(PrefsPage);
-	EditBox.Top := EditLabel.Top + EditLabel.Height;
-	EditBox.Width := PrefsPage.SurfaceWidth - ScaleX(85);
-	EditBox.Text := '';
-	EditBox.Parent := PrefsPage.Surface;
+	DebugEditBox := TEdit.Create(PrefsPage);
+	DebugEditBox.Top := DebugEditLabel.Top + DebugEditLabel.Height;
+	DebugEditBox.Width := PrefsPage.SurfaceWidth - ScaleX(85);
+	DebugEditBox.Text := '';
+	DebugEditBox.Parent := PrefsPage.Surface;
 
-	EditButton := TButton.Create(PrefsPage);
-	EditButton.Top := EditLabel.Top + EditLabel.Height;
-	EditButton.Left := PrefsPage.SurfaceWidth - ScaleX(75);
-	EditButton.Width := ScaleX(75);
-	EditButton.Caption := 'B&rowse...';
-	EditButton.OnClick := @EditButtonClick;
-	EditButton.Parent := PrefsPage.Surface;
+	DebugEditButton := TButton.Create(PrefsPage);
+	DebugEditButton.Top := DebugEditLabel.Top + DebugEditLabel.Height;
+	DebugEditButton.Left := PrefsPage.SurfaceWidth - ScaleX(75);
+	DebugEditButton.Width := ScaleX(75);
+	DebugEditButton.Caption := 'B&rowse...';
+	DebugEditButton.OnClick := @DebugEditButtonClick;
+	DebugEditButton.Parent := PrefsPage.Surface;
 
-	CheckBox := TCheckBox.Create(PrefsPage);
-	CheckBox.Top := EditBox.Top + EditBox.Height + ScaleY(13);
-	CheckBox.Width := PrefsPage.SurfaceWidth;
-	CheckBox.Caption := LangRead('HISTORY_LABEL');
-	CheckBox.Checked := True;
-	CheckBox.Parent := PrefsPage.Surface;
+	AppendExtCheckBox := TCheckBox.Create(PrefsPage);
+	AppendExtCheckBox.Top := DebugEditBox.Top + DebugEditBox.Height + ScaleY(12);
+	AppendExtCheckBox.Width := PrefsPage.SurfaceWidth;
+	AppendExtCheckBox.Caption := LangRead('APPEND_EXT_LABEL');
+	AppendExtCheckBox.Checked := True;
+	AppendExtCheckBox.Parent := PrefsPage.Surface;
+
+	HistoryCheckBox := TCheckBox.Create(PrefsPage);
+	HistoryCheckBox.Top := AppendExtCheckBox.Top + AppendExtCheckBox.Height + ScaleY(5);
+	HistoryCheckBox.Width := PrefsPage.SurfaceWidth;
+	HistoryCheckBox.Caption := LangRead('HISTORY_LABEL');
+	HistoryCheckBox.Checked := True;
+	HistoryCheckBox.Parent := PrefsPage.Surface;
+
+	RemoveDupeCheckBox := TCheckBox.Create(PrefsPage);
+	RemoveDupeCheckBox.Top := HistoryCheckBox.Top + HistoryCheckBox.Height + ScaleY(5);
+	RemoveDupeCheckBox.Width := PrefsPage.SurfaceWidth;
+	RemoveDupeCheckBox.Caption := LangRead('REMOVE_DUPE_LABEL');
+	RemoveDupeCheckBox.Checked := True;
+	RemoveDupeCheckBox.Parent := PrefsPage.Surface;
+
+	RemoveTempCheckBox := TCheckBox.Create(PrefsPage);
+	RemoveTempCheckBox.Top := RemoveDupeCheckBox.Top + RemoveDupeCheckBox.Height + ScaleY(5);
+	RemoveTempCheckBox.Width := PrefsPage.SurfaceWidth;
+	RemoveTempCheckBox.Caption := LangRead('REMOVE_TEMP_LABEL');
+	RemoveTempCheckBox.Checked := True;
+	RemoveTempCheckBox.Parent := PrefsPage.Surface;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
@@ -726,9 +829,15 @@ begin
 		if paramcount() > 0 then begin
 			for i:=1 to paramcount() do begin
 				if Lowercase(Copy(ParamStr(i), 1, 9)) = '/debugdir' then
-					EditBox.Text := RemoveQuotes(Copy(ParamStr(i), 11, Length(ParamStr(i))));
+					DebugEditBox.Text := RemoveQuotes(Copy(ParamStr(i), 11, Length(ParamStr(i))));
+				if Lowercase(Copy(ParamStr(i), 1, 12)) = '/noappendext' then
+					AppendExtCheckBox.Checked := False;
 				if Lowercase(Copy(ParamStr(i), 1, 10)) = '/nohistory' then
-					CheckBox.Checked := False;
+					HistoryCheckBox.Checked := False;
+				if Lowercase(Copy(ParamStr(i), 1, 13)) = '/noremovedupe' then
+					RemoveDupeCheckBox.Checked := False;
+				if Lowercase(Copy(ParamStr(i), 1, 13)) = '/noremovetemp' then
+					RemoveTempCheckBox.Checked := False;
 			end;
 		end;
 	end;
@@ -736,23 +845,35 @@ begin
 	// Preset options if already set in INI file
 	if CurPageId = wpSelectDir then begin
 		inifile := ExpandConstant('{app}\UniExtract.ini');
-		if EditBox.Text = '' then begin
+		if DebugEditBox.Text = '' then begin
 			if IniKeyExists('UniExtract Preferences', 'debugdir', inifile) then begin
-					EditBox.Text := GetIniString('UniExtract Preferences', 'debugdir', ExpandConstant('{sd}\'), inifile);
+					DebugEditBox.Text := GetIniString('UniExtract Preferences', 'debugdir', ExpandConstant('{sd}\'), inifile);
 			end else begin
-				EditBox.Text := ExpandConstant('{sd}\');
+				DebugEditBox.Text := ExpandConstant('{sd}\');
 			end;
 		end;
-		if CheckBox.Checked then
+		if AppendExtCheckBox.Checked then
+			if IniKeyExists('UniExtract Preferences', 'appendext', inifile) then
+				if GetIniString('UniExtract Preferences', 'appendext', '1', inifile) = '0' then
+					AppendExtCheckBox.Checked := False;
+		if HistoryCheckBox.Checked then
 			if IniKeyExists('UniExtract Preferences', 'history', inifile) then
 				if GetIniString('UniExtract Preferences', 'history', '1', inifile) = '0' then
-					CheckBox.Checked := False;
+					HistoryCheckBox.Checked := False;
+		if RemoveDupeCheckBox.Checked then
+			if IniKeyExists('UniExtract Preferences', 'removedupe', inifile) then
+				if GetIniString('UniExtract Preferences', 'removedupe', '1', inifile) = '0' then
+					RemoveDupeCheckBox.Checked := False;
+		if RemoveTempCheckBox.Checked then
+			if IniKeyExists('UniExtract Preferences', 'removetemp', inifile) then
+				if GetIniString('UniExtract Preferences', 'removetemp', '1', inifile) = '0' then
+					RemoveTempCheckBox.Checked := False;
 	end;
 
 	// Validate debugdir, set to default options if necessary
 	if CurPageID = PrefsPage.ID then
-		if EditBox.Text = '' then
-			EditBox.Text := ExpandConstant('{sd}\');
+		if DebugEditBox.Text = '' then
+			DebugEditBox.Text := ExpandConstant('{sd}\');
 
 	Result := True;
 end;
@@ -760,7 +881,7 @@ end;
 const
 	ComponentList = '';
 	TaskList = 'associate - Enable Explorer context menu integration | associate\files - Add UniExtract Files... to context menu | associate\here - Add UniExtract Here to context menu | associate\subdir - Add UniExtract to Subdir to context menu | associate\force - Force association with all supported archive formats | modifypath - Add Universal Extractor to your system path | startmenuicon - Create a Start Menu icon | desktopicon - Create a desktop icon | quicklaunchicon - Create a Quick Launch icon';
-	ParameterList = '/DEBUGDIR="x:\dirname" - Sets the directory used for debug file output.  This defaults to the root of your system drive (usually "C:\") | /NOHISTORY - Disables archive and directory history functionality.';
+	ParameterList = '/DEBUGDIR="x:\dirname" - Sets the directory used for debug file output.  This defaults to the root of your system drive (usually "C:\") | /NOAPPENDEXT - Disables using TrID to identify and append file extensions to unknown files | /NOHISTORY - Disables archive and directory history functionality | /NOREMOVEDUPE - Duplicate files extracted by InstallExplorer will not be removed | /NOREMOVETEMP - Temporary files extracted by WUN will not be removed';
 #include "..\..\clihelp\clihelp.iss"
 
 function ModPathDir(): String;

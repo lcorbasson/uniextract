@@ -1,5 +1,15 @@
 Todo:
 
+validate default log location can be written to prior to first attempt
+investigate admin-only and drag-and-drop issues under Vista
+re-add Spanish support (need new translator)
+fix installer path issue under Windows 9x
+fix FileSearch() function under Windows 9x
+add Vietnamese translation for installer (does it exist?)
+fix noun/adjective order support for translations
+fix _unpacked (lack of) translation
+add sendto option for installer
+add multiple aspack decompressors
 fix context-menu integration for limited users (HKCR issue) - comment 304
 separate associated file types for Windows Explorer sorting? - comment 116
 get 4nt shell solution from clauderenaud - comment 154
@@ -8,18 +18,14 @@ add option to open destination folder after extraction - comment 193
 add OLE extraction support? (need download link for olex_d)- comment 195
 add JPEG extraction support? - comment 195, 245
 figure out how to display and provide input for confirmation prompts
-add InstallShield 5.x, 7.x decompilers - comment 195
 powerpoint image extractor - comment 220
-make AutoIt system tray icon visible? - comment 247
 windows 9x compatability issues - comment 285
 
 Can't do:
 - can PhotoStory3.exe be supported - comment 169
 - support ASprotect files? (need samples) - comment 169
 - support skypesetup.exe - comment 154 - custom build of Inno Setup
-- support for old-NSIS (compressed in BZip2) - comment 170 - NSIS doesn't support it
 - multi-purpose file ripper - comment 220
-- add support for Setup Factory installers? - comment 121
 
 Done:
 - check 7za.exe to see if current version supports all 7z.exe formats
@@ -57,3 +63,10 @@ Done:
 - add "Detect filetype" option?
 - add support for internationalization - comment 161
 - add support for LIT - comment 312
+- make AutoIt system tray icon visible? - comment 247
+- add support for pea format - http://sourceforge.net/projects/peazip
+- add InstallShield 5.x, 7.x decompilers - comment 195, 346
+- add support for uu/uue, b64/mme/mime, yenc/ync
+- update to use ShellExecute
+- support for old-NSIS (compressed in BZip2) - comment 170 - 7-zip doesn't support it (using InstallExplorer)
+- add support for Setup Factory installers? - comment 121 (using InstallExplorer)

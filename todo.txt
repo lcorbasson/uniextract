@@ -1,0 +1,8 @@
+The following features should be added before version 1.0 is released:
+	ISO support
+	Associate only with archive files
+
+The following features are longer term goals:
+	NSIS support
+	Analyze binary files directly with AutoIt rather than using PEiD
+	Incorporate output within AutoIt GUI rather than spawning external shell(s)

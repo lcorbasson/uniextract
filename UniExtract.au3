@@ -1,9 +1,9 @@
 ; ----------------------------------------------------------------------------
 ;
-; Universal Extractor v1.0
+; Universal Extractor v1.1
 ; Author:	Jared Breland <jbreland@legroom.net>
 ; Homepage:	http://www.legroom.net/mysoft
-; Language:	AutoIt v3.1.1
+; Language:	AutoIt v3.1.1.119-beta
 ; License:	GNU General Public License (http://www.gnu.org/copyleft/gpl.html)
 ;
 ; Script Function:
@@ -13,12 +13,16 @@
 ; ----------------------------------------------------------------------------
 
 ; Setup environment
-#notrayicon
+;#notrayicon
 #include <GUIConstants.au3>
+#include <File.au3>
+opt("GUIOnEventMode", 1)
+;opt("WinTitleMatchMode", 4)
 $7z = "7z.exe"
 $ace = "xace.exe"
 $arc = "arc.exe"
 $arj = "arj.exe"
+$bin = "bin2iso.exe"
 $bz2 = "7z.exe"
 $cab = "7z.exe"
 $chm = "7z.exe"
@@ -27,9 +31,11 @@ $deb = "7z.exe"
 $expand = "expand.exe"
 $gz = "7z.exe"
 $hlp = "helpdeco.exe"
+$img = "EXTRACT.EXE"
 $inno = "innounp.exe"
 $iscab = "i6comp.exe"
 $isexe = "IsXunpack.exe"
+$iso = "7z.exe"
 $lzh = "7z.exe"
 $lzo = "lzop.exe"
 $peid = "peid.exe"
@@ -41,10 +47,9 @@ $wise_wun = "wun.exe"
 $Z = "7z.exe"
 $zip = "unzip.exe"
 $output = " 2>&1 | tee.exe c:\uniextract.txt"
-$title = "Universal Extractor"
+$title = "Universal Extractor 1.1"
 $peidtitle = "PEiD v0.93"
 $height = @desktopheight/3
-;opt("WinTitleMatchMode", 4)
 dim $file, $filetype, $outdir, $prompt
 dim $exsig, $loadplugins, $stayontop
 
@@ -79,72 +84,54 @@ endif
 ; If no file passed, display GUI to select file and set options
 if $prompt then
 	; Create GUI
-	GUICreate($title, 300, 115)
-	GUICtrlCreateLabel("Archive/Installer to extract:", 5, 5, -1, 20)
-	$filecont = GUICtrlCreateInput("", 5, 20, 260, 20)
+	GUICreate($title, 300, 115, -1, -1, -1, $WS_EX_ACCEPTFILES)
+	$dropzone = GUICtrlCreateLabel("", 0, 0, 300, 115)
+	GUICtrlCreateLabel("Archive/Installer to extract:", 5, 5, -1, 15)
+	$filecont = GUICtrlCreateCombo("", 5, 20, 260, 20)
+	;$filecont = GUICtrlCreateInput("", 5, 20, 260, 20)
 	$filebut = GUICtrlCreateButton("...", 270, 20, 25, 20)
-	GUICtrlCreateLabel("Target directory:", 5, 45, -1, 20)
-	$dircont = GUICtrlCreateInput("", 5, 60, 260, 20)
+	GUICtrlCreateLabel("Target directory:", 5, 45, -1, 15)
+	$dircont = GUICtrlCreateCombo("", 5, 60, 260, 20)
+	;$dircont = GUICtrlCreateInput("", 5, 60, 260, 20)
 	$dirbut = GUICtrlCreateButton("...", 270, 60, 25, 20)
 	$ok = GUICtrlCreateButton("&OK", 55, 90, 80, 20)
 	$cancel = GUICtrlCreateButton("&Cancel", 165, 90, 80, 20)
 
 	; Set properties
+	GUICtrlSetBkColor($dropzone, $GUI_BKCOLOR_TRANSPARENT)
+	GUICtrlSetState($dropzone, $GUI_DISABLE)
+	GUICtrlSetState($dropzone, $GUI_DROPACCEPTED)
 	GUICtrlSetState($filecont, $GUI_FOCUS)
+	GUICtrlSetState($ok, $GUI_DEFBUTTON)
 	if $file <> "" then
 		;$file = filegetlongname($file)
-		GUICtrlSetData($filecont, $file)
+		$filelist = '|' & $file & '|' & ReadHist('file')
+		GUICtrlSetData($filecont, $filelist, $file)
+		;GUICtrlSetData($filecont, $file)
 		$filedir = stringleft($file, stringinstr($file, '\', 0, -1)-1)
 		$fileext = stringtrimleft($file, stringinstr($file, '.', 0, -1))
 		$filename = stringtrimright(stringtrimleft($file, stringlen($filedir)+1), stringlen($fileext)+1)
-		GUICtrlSetData($dircont, $filedir & '\' & $filename)
+		$dirlist = '|' & $filedir & '\' & $filename & '|' & ReadHist('directory')
+		GUICtrlSetData($dircont, $dirlist, $filedir & '\' & $filename)
 		GUICtrlSetState($dircont, $GUI_FOCUS)
+	else
+		GUICtrlSetData($filecont, ReadHist('file'))
+		GUICtrlSetData($dircont, ReadHist('directory'))
 	endif
-	GUICtrlSetState($ok, $GUI_DEFBUTTON)
+
+	; Set events
+	GUISetOnEvent($GUI_EVENT_DROPPED, "GUI_Drop")
+	GUICtrlSetOnEvent($filebut, "GUI_File")
+	GUICtrlSetOnEvent($dirbut, "GUI_Directory")
+	GUICtrlSetOnEvent($ok, "GUI_Ok")
+	GUICtrlSetOnEvent($cancel, "GUI_Exit")
+	GUISetOnEvent($GUI_EVENT_CLOSE, "GUI_Exit")
 
 	; Display GUI and wait for action
 	GUISetState(@SW_SHOW)
+	$finishgui = 0
 	while 1
-		$action = GUIGetMsg()
-		select
-			; Set file to extract and target directory, then exit
-			case $action = $ok
-				$file = GUICtrlRead($filecont)
-				if fileexists($file) then
-					if GUICtrlRead($dircont) <> "" then
-						$outdir = GUICtrlRead($dircont)
-						GUIDelete()
-						exitloop
-					else
-						msgbox(48, $title, "You must select a destination directory.")
-					endif
-				else
-					msgbox(48, $title, $file & " does not exist." & @CRLF & "Please select valid file.")
-				endif
-	
-			; Prompt user for file
-			case $action = $filebut
-				$file = fileopendialog("Open file", "", "Select file (*.*)", 1)
-				if not @error then
-					GUICtrlSetData($filecont, $file)
-					if GUICtrlRead($dircont) = "" then
-						$filedir = stringleft($file, stringinstr($file, '\', 0, -1)-1)
-						$fileext = stringtrimleft($file, stringinstr($file, '.', 0, -1))
-						$filename = stringtrimright(stringtrimleft($file, stringlen($filedir)+1), stringlen($fileext)+1)
-						GUICtrlSetData($dircont, $filedir & '\' & $filename)
-					endif
-					GUICtrlSetState($ok, $GUI_FOCUS)
-				endif
-
-			; Prompt user for directory
-			case $action = $dirbut
-				$outdir = fileselectfolder("Extract to", "", 3, GUICtrlRead($dircont))
-				if not @error then GUICtrlSetData($dircont, $outdir)
-
-			; Exit if Cancel clicked or window closed
-			case $action = $GUI_EVENT_CLOSE OR $action = $cancel
-				exit
-		endselect
+		if $finishgui then exitloop
 	wend
 endif
 
@@ -157,12 +144,16 @@ $filename = stringtrimright(stringtrimleft($file, stringlen($filedir)+1), string
 if $outdir = '/sub' then
 	$outdir = $filedir & '\' & $filename
 elseif stringmid($outdir, 2, 1) <> ":" then
-	if stringleft($outdir, 1) == "\" then
+	if stringleft($outdir, 1) == '\' then
 		$outdir = stringleft($filedir, 2) & $outdir
 	else
-		$outdir = _PathFull($filedir & "\" & $outdir)
+		$outdir = _PathFull($filedir & '\' & $outdir)
 	endif
 endif
+
+; Update history
+WriteHist('file', $file)
+WriteHist('directory', $outdir)
 
 ; Extract contents from known file extensions
 if $fileext = "7z" then
@@ -176,6 +167,9 @@ elseif $fileext = "arc" then
 
 elseif $fileext = "arj" then
 	extract("arj", "ARJ archive")
+
+elseif $fileext = "bin" then
+	extract("bin", "BIN/CUE CD-ROM image")
 
 elseif $fileext = "bz2" then
 	extract("bz2", "bzip2 compressed file")
@@ -195,6 +189,9 @@ elseif $fileext = "chm" then
 elseif $fileext = "cpio" then
 	extract("cpio", "CPIO archive")
 
+elseif $fileext = "cue" then
+	extract("bin", "BIN/CUE CD-ROM image")
+
 elseif $fileext = "deb" then
 	extract("deb", "Debian package")
 
@@ -206,6 +203,12 @@ elseif $fileext = "gz" then
 
 elseif $fileext = "hlp" then
 	extract("hlp", "Windows Help file")
+
+elseif $fileext = "img" then
+	extract("img", "Floppy disk image")
+
+elseif $fileext = "iso" then
+	extract("iso", "ISO CD-ROM image")
 
 elseif $fileext = "lzh" OR $fileext = "lha" then
 	extract("lzh", "LZH compressed file")
@@ -238,7 +241,7 @@ elseif $fileext = "zip" OR $fileext = "jar" OR $fileext = "xpi" then
 elseif $fileext = "exe" then
 
 	; Backup existing PEiD options
-	splashtexton($title, "Scanning file.", 250, 25, -1, $height, 16)
+	splashtexton($title, "Scanning file.", 275, 25, -1, $height, 16)
 	$exsig = regread("HKCU\Software\PEiD", "ExSig")
 	$loadplugins = regread("HKCU\Software\PEiD", "LoadPlugins")
 	$stayontop = regread("HKCU\Software\PEiD", "StayOnTop")
@@ -340,15 +343,55 @@ else
 	terminate("unknownext", $file, "")
 endif
 
-msgbox(0,'','exit test')
 exit
 
 ; -------------------------- Begin Custom Functions ---------------------------
 
+; Read history
+func ReadHist($field)
+	if $field = 'file' then
+		$reg = "HKCU\Software\UniExtract\History\File"
+	elseif $field = 'directory' then
+		$reg = "HKCU\Software\UniExtract\History\Directory"
+	else
+		return;
+	endif
+	local $history
+	for $i = 0 to 9
+		$value = regread($reg, $i)
+		if $value <> "" then $history = $history & '|' & $value
+	next
+	$history = stringtrimleft($history, 1)
+	return $history
+endfunc
+
+; Write history
+func WriteHist($field, $new)
+	if $field = 'file' then
+		$reg = "HKCU\Software\UniExtract\History\File"
+	elseif $field = 'directory' then
+		$reg = "HKCU\Software\UniExtract\History\Directory"
+	else
+		return;
+	endif
+	$histarr = stringsplit(ReadHist($field), '|')
+	regwrite($reg, "0", "REG_SZ", $new)
+	if $histarr[1] == "" then return
+	for $i = 1 to $histarr[0]
+		if $i > 9 then exitloop
+		if $histarr[$i] = $new then
+			regdelete($reg, string($i))
+			continueloop
+		endif
+		regwrite($reg, string($i), "REG_SZ", $histarr[$i])
+	next
+endfunc
+
+; Extract from known archive format
 func extract($arctype, $arcdisp)
 	; Display banner and create subdirectory
 	dim $createdir
-	splashtexton($title, "Extracting files from:" & @CRLF & $arcdisp, 250, 45, -1, $height, 16)
+	splashtexton($title, "Extracting files from:" & @CRLF & $arcdisp, 275, 45, -1, $height, 16)
 	if not fileexists($outdir) then
 		$validdir = dircreate($outdir)
 		if not $validdir then terminate("invaliddir", $outdir, "")
@@ -398,6 +441,44 @@ func extract($arctype, $arcdisp)
 		case $arctype == "cpio"
 			runwait(@comspec & ' /c ' & $cpio & ' x "' & $file & '"' & $output, $outdir)
 
+		case $arctype == "bin"
+			$convert =  msgbox(65, $title, "BIN/CUE CD-ROM images cannot be extracted directly.  Instead, this image" & @CRLF & "will be converted to an ISO CD-ROM image, which will then be extracted." & @CRLF & @CRLF & "Would you like to continue?" & @CRLF & "Note: This process will take several minutes.")
+			if $convert <> 1 then
+				dirremove($outdir, 0)
+				exit
+			endif
+			if NOT fileexists($filedir & '\' & $filename & ".bin") then
+				msgbox(48, $title, "Error: Could not find:" & @CRLF & $filedir & '\' & $filename & ".bin" & @CRLF & @CRLF & "Both " & $filename & ".bin and " & $filename & ".cue are needed.")
+				dirremove($outdir, 0)
+				exit
+			endif
+			if NOT fileexists($filedir & '\' & $filename & ".cue") then
+				msgbox(48, $title, "Error:  Could not find:" & @CRLF & $filedir & '\' & $filename & ".cue" & @CRLF & @CRLF & "Both " & $filename & ".bin and " & $filename & ".cue are needed.")
+				dirremove($outdir, 0)
+				exit
+			endif
+			controlsettext($title, '', 'Static1', "Extracting files from:" & @CRLF & "BIN/CUE CD-ROM image (Stage 1)")
+			runwait(@comspec & ' /c ' & $bin & ' "' & $filedir & '\' & $filename & '.cue"' & $output, $filedir)
+			msgbox(0, 'Test', 'test')
+			$isofile = filefindfirstfile($filedir & '\' & $filename & '-*.iso')
+			if $isofile == -1 then
+				msgbox(64, $title, "Error:  The BIN/CUE image could not be converted." & @CRLF & "Please ensure that the CUE file is properly formatted.")
+				dirremove($outdir, 0)
+				terminate("failed", $file, $arcdisp)
+			else
+				$isofilename = filefindnextfile($isofile)
+				controlsettext($title, '', 'Static1', "Extracting files from:" & @CRLF & "BIN/CUE CD-ROM image (Stage 2)")
+				runwait(@comspec & ' /c ' & $iso & ' x "' & $filedir & '\' & $isofilename & '"' & $output, $outdir)
+				if dirgetsize($outdir) == 0 then
+					$image = msgbox(51, $title, "Error:  An ISO image was created from tbe BIN/CUE image, but it could not be converted." & @CRLF & "Would you like to keep the ISO image for further analysis?")
+					if $image == 7 then filedelete($filedir & '\' & $isofilename)
+					dirremove($outdir, 0)
+					exit
+				else
+					filedelete($filedir & '\' & $isofilename)
+				endif
+			endif
+
 		case $arctype == "deb"
 			runwait(@comspec & ' /c ' & $deb & ' x "' & $file & '"' & $output, $outdir)
 
@@ -420,11 +501,22 @@ func extract($arctype, $arcdisp)
 				dirremove($outdir & '\Reconstructed', 1)
 			endif
 
+		case $arctype == "img"
+			runwait(@comspec & ' /c ' & $img & ' -x "' & $file & '"' & $output, $outdir)
+
 		case $arctype == "inno"
 			runwait(@comspec & ' /c ' & $inno & ' -x "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "iscab"
-			runwait(@comspec & ' /c ' & $iscab & ' x -r "' & $file & '"' & $output, $outdir)
+			runwait(@comspec & ' /c ' & $iscab & ' l -o "' & $file & '"' & $output, $outdir)
+			$infile = fileopen("c:\uniextract.txt", 0)
+			$line = filereadline($infile)
+			do
+				$isfile = stringtrimleft($line, stringinstr($line, ' ', 0, -1))
+				runwait(@comspec & ' /c ' & $iscab & ' e "' & $file & '" "' & $isfile & '"', $outdir, @SW_HIDE)
+				$line = filereadline($infile)
+			until @error
+			fileclose($infile)
 
 		case $arctype == "isexe"
 			filemove($file, $outdir)
@@ -449,6 +541,8 @@ func extract($arctype, $arcdisp)
 				filewriteline("c:\uniextract.txt", $arcdisp & " extractions cannot be logged.")
 			endif
 
+		case $arctype == "iso"
+			runwait(@comspec & ' /c ' & $iso & ' x "' & $file & '"' & $output, $outdir)
 
 		case $arctype == "lzh"
 			runwait(@comspec & ' /c ' & $lzh & ' x "' & $file & '"' & $output, $outdir)
@@ -529,6 +623,7 @@ func extract($arctype, $arcdisp)
 	terminate("success", "", "")
 endfunc
 
+; Handle program termination with appropriate error message
 func terminate($status, $name, $id)
 	; Display error message if file could not be extracted
 	select
@@ -633,107 +728,80 @@ func WiseSelect()
 	wend
 endfunc
 
-; -------------------------- Begin AutoIt Beta UDFs ---------------------------
+; ------------------------ Begin GUI Control Functions ------------------------
 
-; ===================================================================
-; Author: Jason Boggs <vampirevalik AT hotmail DOT com
-; Comments stripped
-; ===================================================================
-Func _PathFull($szRelPath)
-	Local $drive, $dir, $file, $ext, $wDrive, $wDir, $NULL, $szABSPath
-	Local $i, $nPos
-	_PathSplit($szRelPath, $drive, $dir, $file, $ext)
-	_PathSplit(@WorkingDir, $wDrive, $wDir, $NULL, $NULL)
-	If Not StringLen($drive) Then
-		$drive = $wDrive
-		$dir = $wDir & $dir
-	EndIf
-	If Not StringLen($dir) And Not StringLen($file) And Not StringLen($ext) Then
-		If $drive = $wDrive Then Return _PathMake($wDrive, $wDir, "", "")
-		Return _PathMake($drive, "\", "", "")
-	EndIf
-	While StringInStr($dir, ".\") Or StringInStr($dir, "./")
-		$nPos = StringInStr($dir, ".\")
-		If $nPos = 0 Then $nPos = StringInStr($dir, "./")
-		If $nPos = 0 Then ExitLoop
-		If StringMid($dir, $nPos - 1, 1) = "." Then
-			For $i = ($nPos - 3) To 0 Step - 1
-				If StringMid($dir, $i, 1) = "\" Or StringMid($dir, $i, 1) = "/" Then ExitLoop
-			Next
-			If $i > 0 Then
-				$dir = StringLeft($dir, $i) & StringRight($dir, StringLen($dir) - ($nPos + 1))
-			Else
-				$dir = StringRight($dir, StringLen($dir) - ($nPos + 1))
-			EndIf
-		Else
-			$dir = StringLeft($dir, $nPos - 1) & StringRight($dir, StringLen($dir) - $nPos - 1)
-		EndIf
-		If Not StringLen($dir) Then $dir = "\"
-	WEnd
-	Return _PathMake($drive, $dir, $file, $ext)
-EndFunc
+; Prompt user for file
+func GUI_File()
+	$file = fileopendialog("Open file", "", "Select file (*.*)", 1)
+	if not @error then
+		$filelist = '|' & $file & '|' & ReadHist('file')
+		GUICtrlSetData($filecont, $filelist, $file)
+		if GUICtrlRead($dircont) = "" then
+			$filedir = stringleft($file, stringinstr($file, '\', 0, -1)-1)
+			$fileext = stringtrimleft($file, stringinstr($file, '.', 0, -1))
+			$filename = stringtrimright(stringtrimleft($file, stringlen($filedir)+1), stringlen($fileext)+1)
+			$dirlist = '|' & $filedir & '\' & $filename & '|' & ReadHist('directory')
+			GUICtrlSetData($dircont, $dirlist, $filedir & '\' & $filename)
+		endif
+		GUICtrlSetState($ok, $GUI_FOCUS)
+	endif
+endfunc
 
-Func _PathSplit($szPath, ByRef $szDrive, ByRef $szDir, ByRef $szFName, ByRef $szExt)
-	Local $drive = ""
-	Local $dir = ""
-	Local $fname = ""
-	Local $ext = ""
-	Local $i, $pos
-	Dim $array[5]
-	$array[0] = $szPath
-	If StringMid($szPath, 2, 1) = ":" Then
-		$drive = StringLeft($szPath, 2)
-		$szPath = StringTrimLeft($szPath, 2)
-	ElseIf StringLeft($szPath, 2) = "\\" Then
-		$szPath = StringTrimLeft($szPath, 2)
-		$pos = StringInStr($szPath, "\")
-		If $pos = 0 Then $pos = StringInStr($szPath, "/")
-		If $pos = 0 Then
-			$drive = "\\" & $szPath
-			$szPath = ""
-		Else
-			$drive = "\\" & StringLeft($szPath, $pos - 1)
-			$szPath = StringTrimLeft($szPath, $pos - 1)
-		EndIf
-	EndIf
-	For $i = StringLen($szPath) To 0 Step - 1
-		If StringMid($szPath, $i, 1) = "\" Or StringMid($szPath, $i, 1) = "/" Then
-			$dir = StringLeft($szPath, $i)
-			$fname = StringRight($szPath, StringLen($szPath) - $i)
-			ExitLoop
-		EndIf
-	Next
-	If StringLen($dir) = 0 Then $fname = $szPath
-	For $i = StringLen($fname) To 0 Step - 1
-		If StringMid($fname, $i, 1) = "." Then
-			$ext = StringRight($fname, StringLen($fname) - ($i - 1))
-			$fname = StringLeft($fname, $i - 1)
-			ExitLoop
-		EndIf
-	Next
-	$szDrive = $drive
-	$szDir = $dir
-	$szFName = $fname
-	$szExt = $ext
-	$array[1] = $drive
-	$array[2] = $dir
-	$array[3] = $fname
-	$array[4] = $ext
-	Return $array
-EndFunc
+; Prompt user for directory
+func GUI_Directory()
+	if fileexists(GUICtrlRead($dircont)) then
+		$defdir = GUICtrlRead($dircont)
+	elseif fileexists(GUICtrlRead($filecont)) then
+		$defdir = stringleft(GUICtrlRead($filecont), stringinstr(GUICtrlRead($filecont), '\', 0, -1)-1)
+	else
+		$defdir = '';
+	endif
+	$outdir = fileselectfolder("Extract to", "", 3, $defdir)
+	if not @error then
+		$dirlist = '|' & $outdir & '|' & ReadHist('directory')
+		GUICtrlSetData($dircont, $dirlist, $outdir)
+	endif
+endfunc
 
-Func _PathMake($szDrive, $szDir, $szFName, $szExt)
-	Local $szFullPath
-	If StringLen($szDrive) Then
-		If Not (StringLeft($szDrive, 2) = "\\") Then	$szDrive = StringLeft($szDrive, 1) & ":"
-	EndIf
-	If StringLen($szDir) Then
-		If Not (StringRight($szDir, 1) = "\") And Not (StringRight($szDir, 1) = "/") Then $szDir = $szDir & "\"
-	EndIf
-	If StringLen($szExt) Then
-		If Not (StringLeft($szExt, 1) = ".") Then $szExt = "." & $szExt
-	EndIf
-	$szFullPath = $szDrive & $szDir & $szFName & $szExt
-	Return $szFullPath
-EndFunc
+; Set file to extract and target directory, then exit
+func GUI_Ok()
+	$file = GUICtrlRead($filecont)
+	if fileexists($file) then
+		if GUICtrlRead($dircont) == "" then
+			$outdir = '/sub'
+		else
+			$outdir = GUICtrlRead($dircont)
+		endif
+		GUIDelete()
+		$finishgui = 1
+	else
+		if $file == '' then
+			$file = '';
+		else
+			$file = $file & " does not exist." & @CRLF;
+		endif
+		msgbox(48, $title, $file & "Please select valid file.")
+	endif
+endfunc
+
+; Process dropped files outside of file input box
+func GUI_Drop()
+	if fileexists(@GUI_DragFile) then
+		$file = @GUI_DragFile
+		$filelist = '|' & $file & '|' & ReadHist('file')
+		GUICtrlSetData($filecont, $filelist, $file)
+		if GUICtrlRead($dircont) = "" then
+			$filedir = stringleft($file, stringinstr($file, '\', 0, -1)-1)
+			$fileext = stringtrimleft($file, stringinstr($file, '.', 0, -1))
+			$filename = stringtrimright(stringtrimleft($file, stringlen($filedir)+1), stringlen($fileext)+1)
+			$dirlist = '|' & $filedir & '\' & $filename & '|' & ReadHist('directory')
+			GUICtrlSetData($dircont, $dirlist, $filedir & '\' & $filename)
+		endif
+	endif
+endfunc
+
+; Exit if Cancel clicked or window closed
+func GUI_Exit()
+	exit
+endfunc
 
